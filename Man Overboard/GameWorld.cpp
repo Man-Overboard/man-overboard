@@ -4,7 +4,10 @@
 #include "WindowUtils.h"
 
 #include <list>
+#include <queue>
+
 using std::list;
+using std::string;
 
 
 //------------------------------- creator --------------------------------
@@ -44,17 +47,35 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
   {
 
 
-    case 'P':
-      
-      TogglePause(); break;
+    case 'F':
 
+		AddToQueueList("F");
       break;
 
-    case 'Y':
-		 
+    case 'R':
+		 AddToQueueList("R");
       break;
+
+	case 'L':
+		 AddToQueueList("L");
+      break;
+
+	case 'C':
+		while (!m_commandQueue.empty()) {
+			m_commandQueue.pop();
+		}	
+		break;
+
+	case 'G':
+		break;
 
   }//end switch
+}
+
+void GameWorld::AddToQueueList(string command)
+{
+	// logic to ensure queue not already full
+	m_commandQueue.push(command);
 }
 
 
@@ -84,6 +105,38 @@ void GameWorld::DrawGrid(){
   }
 }
 
+void GameWorld::DrawControls(){
+	gdi->BlackPen();
+	gdi->WhiteBrush();
+
+	// Container Box
+	double x,y;
+	x = m_vBox.x + (constBoxSize*constLevelOneGridSize+(constBoxSize/2));
+	y = m_vBox.y;
+	gdi->Rect(x,y,x+constControlWidth,y+constControlHeight);
+
+	// Title Text
+	int lineHeight = 20;
+	gdi->TextAtPos(x + constControlWidth/4, y + 10, "Controls");
+	gdi->TextColor(Cgdi::black);
+
+	// Movement Controls
+	gdi->TextAtPos(x + 20, y + lineHeight*2, "FORWARD (F)");
+	gdi->TextAtPos(x + 20, y + lineHeight*3, "TURN RIGHT 90 (R)");
+	gdi->TextAtPos(x + 20, y + lineHeight*4, "TURN LEFT 90 (L)");
+	gdi->TextAtPos(x + 20, y + lineHeight*5, "CLEAR (C)");
+	gdi->TextAtPos(x + 20, y + lineHeight*6, "GO (G)");
+
+	// Queued Moves
+	gdi->TextAtPos(x + constControlWidth/4, y + lineHeight*10, "Queued Moves");
+	std::queue<std::string> tempQueue = m_commandQueue;
+	int counter = 0;
+	while (!tempQueue.empty()){
+		counter++;
+		gdi->TextAtPos(x + 20, y + lineHeight*(10+counter), tempQueue.front());
+		tempQueue.pop();
+	}
+}
 
 //------------------------------ Render ----------------------------------
 //------------------------------------------------------------------------
@@ -91,6 +144,7 @@ void GameWorld::Render()
 {
   // find all the game objects and draw them!
 	DrawGrid();
+	DrawControls();
 
 
   //gdi->TextAtPos(5, cyClient() - 20, "Click left mouse button to move crosshair, and right mouse button to move box");

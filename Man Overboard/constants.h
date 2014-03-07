@@ -9,5 +9,9 @@ const int constWindowHeight = 1000;
 const int constBoxSize = 100;
 const int constLevelOneGridSize = 8;
 
+// for controls box
+const int const constControlWidth = 250;
+const int const constControlHeight = 600;
+
 
 #endif

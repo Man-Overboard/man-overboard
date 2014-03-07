@@ -14,6 +14,7 @@
 //------------------------------------------------------------------------
 #include <windows.h>
 #include <vector>
+#include <queue>
 
 #include "Vector2D.h"
 
@@ -33,6 +34,8 @@ private:
 
   //keeps track of the average FPS
   double                         m_dAvFrameTime;
+
+  std::queue<std::string>						m_commandQueue;
   
 
 public:
@@ -45,6 +48,7 @@ public:
 
   void  Render();
   void DrawGrid();
+  void DrawControls();
   
   //handle WM_COMMAND messages
   void        HandleKeyPresses(WPARAM wParam);
@@ -52,6 +56,9 @@ public:
   
   void        TogglePause(){m_bPaused = !m_bPaused;}
   bool        Paused()const{return m_bPaused;}
+
+  // adding to queue
+  void	AddToQueueList(std::string command);
 
   int   cxClient()const{return m_cxClient;}
   int   cyClient()const{return m_cyClient;}
