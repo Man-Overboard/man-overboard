@@ -30,22 +30,6 @@ private:
 
   //the positions for the grid layout
   Vector2D						m_vBox;
-  Vector2D						rectangle1;
-  Vector2D						rectangle2;
-  Vector2D						rectangle3;
-  Vector2D						rectangle4;
-  Vector2D						rectangle5;
-  Vector2D						rectangle6;
-  Vector2D						rectangle7;
-  Vector2D						rectangle8;
-  Vector2D						rectangle9;
-  Vector2D						rectangle10;
-  Vector2D						rectangle11;
-  Vector2D						rectangle12;
-  Vector2D						rectangle13;
-  Vector2D						rectangle14;
-  Vector2D						rectangle15;
-  Vector2D						rectangle16;
 
   //keeps track of the average FPS
   double                         m_dAvFrameTime;
