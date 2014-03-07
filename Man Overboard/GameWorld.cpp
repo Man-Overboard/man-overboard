@@ -19,7 +19,7 @@ GameWorld::GameWorld(int cx, int cy):
             m_bPaused(false),
 			m_vBox(Vector2D(cxClient()-(constWindowWidth-80), cyClient()-(constWindowHeight-80))), // get the values for the overall box the grid will be contained in
 			m_player(Vector2D(m_vBox.x + (constBoxSize/2), m_vBox.y + ((constLevelOneGridSize*constBoxSize)-constBoxSize/2))),
-			m_playerDirection('S')
+			m_playerDirection('N')
 {
  
 }
@@ -149,6 +149,21 @@ void GameWorld::DrawPlayer(Vector2D position) {
 }
 
 void GameWorld::RunCommandSequence() {
+	// pop the command off the queue
+	while (!m_commandQueue.empty()){
+		string value = m_commandQueue.front();
+		if (value == "R" || value == "L"){
+			TurnPlayer(value);
+		}
+		if (value == "F"){
+			MovePlayer();
+		}
+		m_commandQueue.pop();
+	}
+	
+}
+
+void GameWorld::MovePlayer(){
 	Vector2D position;
 	switch (m_playerDirection) {
 		case 'N' :
@@ -171,6 +186,43 @@ void GameWorld::RunCommandSequence() {
 	bool valid = ValidateMove(position);
 	if(valid){
 		DrawPlayer(position);
+	}
+}
+
+void GameWorld::TurnPlayer(string direction) {
+	switch (m_playerDirection) {
+		case 'N' :
+			if (direction == "R"){
+				m_playerDirection = 'E';
+			}
+			if (direction == "L"){
+				m_playerDirection = 'W';
+			}
+			break;
+		case 'E' :
+			if (direction == "R"){
+				m_playerDirection = 'S';
+			}
+			if (direction == "L"){
+				m_playerDirection = 'N';
+			}
+			break;
+		case 'S' :
+			if (direction == "R"){
+				m_playerDirection = 'W';
+			}
+			if (direction == "L"){
+				m_playerDirection = 'E';
+			}
+			break;
+		case 'W' :
+			if (direction == "R"){
+				m_playerDirection = 'N';
+			}
+			if (direction == "L"){
+				m_playerDirection = 'S';
+			}
+			break;
 	}
 }
 

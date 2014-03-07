@@ -67,6 +67,8 @@ public:
   void	AddToQueueList(std::string command);
   bool ValidateMove(Vector2D newPosition);
   void RunCommandSequence();
+  void MovePlayer();
+  void TurnPlayer(std::string direction);
 
   int   cxClient()const{return m_cxClient;}
   int   cyClient()const{return m_cyClient;}
