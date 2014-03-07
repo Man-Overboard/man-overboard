@@ -243,6 +243,19 @@ bool GameWorld::ValidateMove(Vector2D newPosition)
 	return true;
 }
 
+bool GameWorld::CheckVector(Vector2D v)
+{
+	std::list<Vector2D>::iterator iter = std::find (m_occupiedPositions.begin(), m_occupiedPositions.end(), v);
+	if(iter != m_occupiedPositions.end())
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
+
 void GameWorld::DrawGameObjects(){
 	gdi->GreenBrush();
 	gdi->Circle(m_manOverboard.x, m_manOverboard.y, 20);
@@ -273,8 +286,9 @@ void GameWorld::GenerateEnemyPoints() {
 		int randomY = rand() % constLevelOneGridSize + 0;
 		// check if equal to player
 		Vector2D enemy = Vector2D(m_vBox.x + (constBoxSize*randomX + (constBoxSize/2)), m_vBox.y + (constBoxSize*randomY + (constBoxSize/2)));
-		if (enemy != m_player && enemy != m_manOverboard){
+		if (CheckVector(enemy)){
 			m_enemyPositions.push(enemy);
+			m_occupiedPositions.push_back(enemy);
 			i++;
 		}
 	}
@@ -289,8 +303,9 @@ void GameWorld::GenerateWeaponPoints() {
 		int randomY = rand() % constLevelOneGridSize + 0;
 		// check if equal to player, check nothing else on square
 		Vector2D weapon = Vector2D(m_vBox.x + (constBoxSize*randomX + (constBoxSize/2)), m_vBox.y + (constBoxSize*randomY + (constBoxSize/2)));
-		if (weapon != m_player && weapon != m_manOverboard){
+		if (CheckVector(weapon)){
 			m_weaponPositions.push(weapon);
+			m_occupiedPositions.push_back(weapon);
 			i++;
 		}
 	}
@@ -307,6 +322,8 @@ void GameWorld::Render()
 
 	// draw enemy ships
 	if(init){
+		m_occupiedPositions.push_back(m_player);
+		m_occupiedPositions.push_back(m_manOverboard);
 		GenerateEnemyPoints();
 		GenerateWeaponPoints();
 		init = false;

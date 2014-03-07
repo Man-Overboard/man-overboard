@@ -15,6 +15,7 @@
 #include <windows.h>
 #include <vector>
 #include <queue>
+#include <list>
 
 #include "Vector2D.h"
 
@@ -45,6 +46,7 @@ private:
   std::queue<std::string>						m_commandQueue;
   std::queue<Vector2D>							m_enemyPositions;
   std::queue<Vector2D>							m_weaponPositions;
+  std::list<Vector2D>							m_occupiedPositions;
   
 
 public:
@@ -76,6 +78,7 @@ public:
   void RunCommandSequence();
   void MovePlayer();
   void TurnPlayer(std::string direction);
+  bool CheckVector(Vector2D v);
 
   int   cxClient()const{return m_cxClient;}
   int   cyClient()const{return m_cyClient;}
