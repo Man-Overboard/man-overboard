@@ -68,6 +68,7 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
 		break;
 
 	case 'G':
+		DrawPlayer(m_player.x, m_player.y - constBoxSize);
 		break;
 
   }//end switch
@@ -139,9 +140,12 @@ void GameWorld::DrawControls(){
 	}
 }
 
-void GameWorld::DrawPlayer() {
+void GameWorld::DrawPlayer(int x, int y) {
 	gdi->WhiteBrush();
-	gdi->Circle(m_player.x, m_player.y, 20);
+	gdi->Circle(x, y, 20);
+
+	m_player.x = x;
+	m_player.y = y;
 }
 
 
@@ -153,7 +157,7 @@ void GameWorld::Render()
 	DrawGrid();
 	DrawControls();
 
-	DrawPlayer();
+	DrawPlayer(m_player.x, m_player.y);
 
   //gdi->TextAtPos(5, cyClient() - 20, "Click left mouse button to move crosshair, and right mouse button to move box");
   //gdi->TextAtPos(cxClient() -120, cyClient() - 20, "Press R to reset");

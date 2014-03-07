@@ -49,10 +49,10 @@ public:
 
   void  Update(double time_elapsed);
 
-  void  Render();
+  void Render();
   void DrawGrid();
   void DrawControls();
-  void DrawPlayer();
+  void DrawPlayer(int x, int y);
   void DrawGameObjects();
   
   //handle WM_COMMAND messages
