@@ -190,6 +190,7 @@ void GameWorld::MovePlayer(){
 	bool valid = ValidateMove(position);
 	if(valid){
 		DrawPlayer(position);
+		CheckForWeapon();
 	}
 }
 
@@ -254,6 +255,19 @@ bool GameWorld::CheckVector(Vector2D v)
 	{
 		return true;
 	}
+}
+
+void GameWorld::CheckForWeapon() {
+	std::queue<Vector2D> temp;
+	while(!m_weaponPositions.empty()){
+		if(m_player == m_weaponPositions.front()){
+			// set that weapon has been picked up
+		} else {
+			temp.push(m_weaponPositions.front());
+		}
+		m_weaponPositions.pop();
+	}
+	m_weaponPositions = temp;
 }
 
 void GameWorld::DrawGameObjects(){
