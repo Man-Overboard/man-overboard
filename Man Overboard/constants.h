@@ -15,6 +15,6 @@ const int constControlHeight = 600;
 
 // enemies
 const int constLevelOneEnemyCount = 3;
-
+const int constLevelOneWeaponCount = 1;
 
 #endif

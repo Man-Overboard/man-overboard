@@ -21,7 +21,8 @@ GameWorld::GameWorld(int cx, int cy):
 			m_vBox(Vector2D(cxClient()-(constWindowWidth-80), cyClient()-(constWindowHeight-80))), // get the values for the overall box the grid will be contained in
 			m_player(Vector2D(m_vBox.x + (constBoxSize/2), m_vBox.y + ((constLevelOneGridSize*constBoxSize)-constBoxSize/2))),
 			m_playerDirection('N'),
-			init(true)
+			init(true),
+			m_manOverboard(Vector2D(m_vBox.x + ((constLevelOneGridSize*constBoxSize)-constBoxSize/2), m_vBox.y + (constBoxSize/2)))
 {
 
 }
@@ -243,10 +244,21 @@ bool GameWorld::ValidateMove(Vector2D newPosition)
 }
 
 void GameWorld::DrawGameObjects(){
+	gdi->GreenBrush();
+	gdi->Circle(m_manOverboard.x, m_manOverboard.y, 20);
+
 	std::queue<Vector2D> tempQueue = m_enemyPositions;
 	while (!tempQueue.empty()){
 		Vector2D position = tempQueue.front();
 		gdi->BlackBrush();
+		gdi->Circle(position.x, position.y, 20);
+		tempQueue.pop();
+	}
+
+	tempQueue = m_weaponPositions;
+	while (!tempQueue.empty()){
+		Vector2D position = tempQueue.front();
+		gdi->YellowBrush();
 		gdi->Circle(position.x, position.y, 20);
 		tempQueue.pop();
 	}
@@ -261,8 +273,24 @@ void GameWorld::GenerateEnemyPoints() {
 		int randomY = rand() % constLevelOneGridSize + 0;
 		// check if equal to player
 		Vector2D enemy = Vector2D(m_vBox.x + (constBoxSize*randomX + (constBoxSize/2)), m_vBox.y + (constBoxSize*randomY + (constBoxSize/2)));
-		if (enemy != m_player){
+		if (enemy != m_player && enemy != m_manOverboard){
 			m_enemyPositions.push(enemy);
+			i++;
+		}
+	}
+}
+
+void GameWorld::GenerateWeaponPoints() {
+	int i = 0;
+	while (i < constLevelOneWeaponCount)
+	{
+		// random numbers
+		int randomX = rand() % constLevelOneGridSize + 0;
+		int randomY = rand() % constLevelOneGridSize + 0;
+		// check if equal to player, check nothing else on square
+		Vector2D weapon = Vector2D(m_vBox.x + (constBoxSize*randomX + (constBoxSize/2)), m_vBox.y + (constBoxSize*randomY + (constBoxSize/2)));
+		if (weapon != m_player && weapon != m_manOverboard){
+			m_weaponPositions.push(weapon);
 			i++;
 		}
 	}
@@ -280,6 +308,7 @@ void GameWorld::Render()
 	// draw enemy ships
 	if(init){
 		GenerateEnemyPoints();
+		GenerateWeaponPoints();
 		init = false;
 	}
 

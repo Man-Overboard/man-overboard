@@ -37,11 +37,14 @@ private:
   Vector2D						m_player;
   char							m_playerDirection;
 
+  Vector2D						m_manOverboard;
+
   //keeps track of the average FPS
   double                         m_dAvFrameTime;
 
   std::queue<std::string>						m_commandQueue;
   std::queue<Vector2D>							m_enemyPositions;
+  std::queue<Vector2D>							m_weaponPositions;
   
 
 public:
@@ -58,6 +61,7 @@ public:
   void DrawPlayer(Vector2D position);
   void DrawGameObjects();
   void GenerateEnemyPoints();
+  void GenerateWeaponPoints();
   
   //handle WM_COMMAND messages
   void        HandleKeyPresses(WPARAM wParam);
