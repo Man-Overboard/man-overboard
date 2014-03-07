@@ -199,6 +199,7 @@ void GameWorld::MovePlayer(){
 		DrawPlayer(position);
 		CheckForWeapon();
 		CheckForManOverBoard();
+		CheckForDanger();
 	}
 }
 
@@ -289,6 +290,44 @@ void GameWorld::CheckForManOverBoard() {
 		m_objectsToAvoid = std::queue<Vector2D>();
 		m_weaponPositions = std::queue<Vector2D>();
 	}
+}
+
+void GameWorld::CheckForDanger() {
+	// check for enemy or object to avoid
+	// level restarts if player lands on one of these
+	// may implement lives at some point
+	std::queue<Vector2D> temp;
+	while(!m_enemyPositions.empty()){
+		if(m_player == m_enemyPositions.front()){
+			// reset the grid
+			init = true;
+			m_enemyPositions = std::queue<Vector2D>();
+			m_objectsToAvoid = std::queue<Vector2D>();
+			m_weaponPositions = std::queue<Vector2D>();
+			return;
+		} else {
+			temp.push(m_enemyPositions.front());
+		}
+		m_enemyPositions.pop();
+	}
+	m_enemyPositions = temp;
+
+	std::queue<Vector2D> temp2;
+	while(!m_objectsToAvoid.empty()){
+		if(m_player == m_objectsToAvoid.front()){
+			// reset the grid
+			init = true;
+			m_enemyPositions = std::queue<Vector2D>();
+			m_objectsToAvoid = std::queue<Vector2D>();
+			m_weaponPositions = std::queue<Vector2D>();
+			return;
+		} else {
+			temp2.push(m_objectsToAvoid.front());
+			m_objectsToAvoid.pop();
+		}
+	}
+	m_objectsToAvoid = temp2;
+	
 }
 
 void GameWorld::DrawGameObjects(){

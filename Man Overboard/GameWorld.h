@@ -86,6 +86,7 @@ public:
   bool CheckVector(Vector2D v);
   void CheckForWeapon();
   void CheckForManOverBoard();
+  void CheckForDanger();
 
   int   cxClient()const{return m_cxClient;}
   int   cyClient()const{return m_cyClient;}
