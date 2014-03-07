@@ -7,7 +7,7 @@ const int constWindowHeight = 1000;
 
 // box size in grid
 const int constBoxSize = 100;
-const int constLevelOneGridSize = 8;
+const int constLevelOneGridSize = 6;
 
 // for controls box
 const int constControlWidth = 250;

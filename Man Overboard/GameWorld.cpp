@@ -253,12 +253,18 @@ void GameWorld::DrawGameObjects(){
 }
 
 void GameWorld::GenerateEnemyPoints() {
-	int i;
-	for (i = 0; i < constLevelOneEnemyCount; i++){
+	int i = 0;
+	while (i < constLevelOneEnemyCount)
+	{
+		// random numbers
 		int randomX = rand() % constLevelOneGridSize + 0;
 		int randomY = rand() % constLevelOneGridSize + 0;
+		// check if equal to player
 		Vector2D enemy = Vector2D(m_vBox.x + (constBoxSize*randomX + (constBoxSize/2)), m_vBox.y + (constBoxSize*randomY + (constBoxSize/2)));
-		m_enemyPositions.push(enemy);
+		if (enemy != m_player){
+			m_enemyPositions.push(enemy);
+			i++;
+		}
 	}
 }
 
