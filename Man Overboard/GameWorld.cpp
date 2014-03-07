@@ -5,6 +5,7 @@
 
 #include <list>
 #include <queue>
+#include <random>
 
 using std::list;
 using std::string;
@@ -19,9 +20,10 @@ GameWorld::GameWorld(int cx, int cy):
             m_bPaused(false),
 			m_vBox(Vector2D(cxClient()-(constWindowWidth-80), cyClient()-(constWindowHeight-80))), // get the values for the overall box the grid will be contained in
 			m_player(Vector2D(m_vBox.x + (constBoxSize/2), m_vBox.y + ((constLevelOneGridSize*constBoxSize)-constBoxSize/2))),
-			m_playerDirection('N')
+			m_playerDirection('N'),
+			init(true)
 {
- 
+
 }
 
 
@@ -182,6 +184,7 @@ void GameWorld::MovePlayer(){
 			position.x = m_player.x - constBoxSize;
 			position.y = m_player.y;
 			break;
+
 	}
 	bool valid = ValidateMove(position);
 	if(valid){
@@ -239,6 +242,26 @@ bool GameWorld::ValidateMove(Vector2D newPosition)
 	return true;
 }
 
+void GameWorld::DrawGameObjects(){
+	std::queue<Vector2D> tempQueue = m_enemyPositions;
+	while (!tempQueue.empty()){
+		Vector2D position = tempQueue.front();
+		gdi->BlackBrush();
+		gdi->Circle(position.x, position.y, 20);
+		tempQueue.pop();
+	}
+}
+
+void GameWorld::GenerateEnemyPoints() {
+	int i;
+	for (i = 0; i < constLevelOneEnemyCount; i++){
+		int randomX = rand() % constLevelOneGridSize + 0;
+		int randomY = rand() % constLevelOneGridSize + 0;
+		Vector2D enemy = Vector2D(m_vBox.x + (constBoxSize*randomX + (constBoxSize/2)), m_vBox.y + (constBoxSize*randomY + (constBoxSize/2)));
+		m_enemyPositions.push(enemy);
+	}
+}
+
 
 //------------------------------ Render ----------------------------------
 //------------------------------------------------------------------------
@@ -248,10 +271,14 @@ void GameWorld::Render()
 	DrawGrid();
 	DrawControls();
 
-	DrawPlayer(m_player);
+	// draw enemy ships
+	if(init){
+		GenerateEnemyPoints();
+		init = false;
+	}
 
-  //gdi->TextAtPos(5, cyClient() - 20, "Click left mouse button to move crosshair, and right mouse button to move box");
-  //gdi->TextAtPos(cxClient() -120, cyClient() - 20, "Press R to reset");
- // gdi->TextColor(Cgdi::grey);
+	DrawGameObjects();
+
+	DrawPlayer(m_player);
 
 }

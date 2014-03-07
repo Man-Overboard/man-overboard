@@ -10,8 +10,11 @@ const int constBoxSize = 100;
 const int constLevelOneGridSize = 8;
 
 // for controls box
-const int const constControlWidth = 250;
-const int const constControlHeight = 600;
+const int constControlWidth = 250;
+const int constControlHeight = 600;
+
+// enemies
+const int constLevelOneEnemyCount = 3;
 
 
 #endif

@@ -24,6 +24,7 @@ private:
 
   //set true to pause the motion
   bool                          m_bPaused;
+  bool							init;
 
   //local copy of client window dimensions
   int                           m_cxClient,
@@ -40,6 +41,7 @@ private:
   double                         m_dAvFrameTime;
 
   std::queue<std::string>						m_commandQueue;
+  std::queue<Vector2D>							m_enemyPositions;
   
 
 public:
@@ -55,6 +57,7 @@ public:
   void DrawControls();
   void DrawPlayer(Vector2D position);
   void DrawGameObjects();
+  void GenerateEnemyPoints();
   
   //handle WM_COMMAND messages
   void        HandleKeyPresses(WPARAM wParam);
