@@ -32,6 +32,9 @@ private:
   //the positions for the grid layout
   Vector2D						m_vBox;
 
+  // player object 
+  Vector2D						m_player;
+
   //keeps track of the average FPS
   double                         m_dAvFrameTime;
 
@@ -49,6 +52,8 @@ public:
   void  Render();
   void DrawGrid();
   void DrawControls();
+  void DrawPlayer();
+  void DrawGameObjects();
   
   //handle WM_COMMAND messages
   void        HandleKeyPresses(WPARAM wParam);

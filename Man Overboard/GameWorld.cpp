@@ -17,7 +17,8 @@ GameWorld::GameWorld(int cx, int cy):
             m_cxClient(cx),
             m_cyClient(cy),
             m_bPaused(false),
-			m_vBox(Vector2D(cxClient()-(constWindowWidth-80), cyClient()-(constWindowHeight-80))) // get the values for the overall box the grid will be contained in
+			m_vBox(Vector2D(cxClient()-(constWindowWidth-80), cyClient()-(constWindowHeight-80))), // get the values for the overall box the grid will be contained in
+			m_player(Vector2D(m_vBox.x + (constBoxSize/2), m_vBox.y + ((constLevelOneGridSize*constBoxSize)-constBoxSize/2)))
 {
  
 }
@@ -138,6 +139,12 @@ void GameWorld::DrawControls(){
 	}
 }
 
+void GameWorld::DrawPlayer() {
+	gdi->WhiteBrush();
+	gdi->Circle(m_player.x, m_player.y, 20);
+}
+
+
 //------------------------------ Render ----------------------------------
 //------------------------------------------------------------------------
 void GameWorld::Render()
@@ -146,12 +153,10 @@ void GameWorld::Render()
 	DrawGrid();
 	DrawControls();
 
+	DrawPlayer();
 
   //gdi->TextAtPos(5, cyClient() - 20, "Click left mouse button to move crosshair, and right mouse button to move box");
-
   //gdi->TextAtPos(cxClient() -120, cyClient() - 20, "Press R to reset");
  // gdi->TextColor(Cgdi::grey);
-
-
 
 }
