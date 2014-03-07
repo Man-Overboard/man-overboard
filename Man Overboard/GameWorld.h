@@ -44,6 +44,7 @@ public:
   void  Update(double time_elapsed);
 
   void  Render();
+  void DrawGrid();
   
   //handle WM_COMMAND messages
   void        HandleKeyPresses(WPARAM wParam);

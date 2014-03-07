@@ -69,13 +69,7 @@ void GameWorld::HandleMenuItems(WPARAM wParam, HWND hwnd)
   }//end switch
 }
 
-
-//------------------------------ Render ----------------------------------
-//------------------------------------------------------------------------
-void GameWorld::Render()
-{
-  // find all the game objects and draw them!
- 
+void GameWorld::DrawGrid(){
   // the grid
   gdi->BlueBrush();
   gdi->BlackPen();
@@ -88,6 +82,16 @@ void GameWorld::Render()
   for(i=0; i <= constLevelOneGridSize;i++){
 	  gdi->Line(Vector2D(m_vBox.x+(constBoxSize*i), m_vBox.y), Vector2D(m_vBox.x+(constBoxSize*i), m_vBox.y + constBoxSize*constLevelOneGridSize));
   }
+}
+
+
+//------------------------------ Render ----------------------------------
+//------------------------------------------------------------------------
+void GameWorld::Render()
+{
+  // find all the game objects and draw them!
+	DrawGrid();
+
 
   //gdi->TextAtPos(5, cyClient() - 20, "Click left mouse button to move crosshair, and right mouse button to move box");
 
