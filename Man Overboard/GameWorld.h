@@ -47,6 +47,7 @@ private:
   std::queue<Vector2D>							m_enemyPositions;
   std::queue<Vector2D>							m_weaponPositions;
   std::list<Vector2D>							m_occupiedPositions;
+  std::queue<Vector2D>							m_objectsToAvoid;
   
 
 public:
@@ -64,6 +65,7 @@ public:
   void DrawGameObjects();
   void GenerateEnemyPoints();
   void GenerateWeaponPoints();
+  void GenerateAvoidPoints();
   
   //handle WM_COMMAND messages
   void        HandleKeyPresses(WPARAM wParam);
@@ -80,6 +82,7 @@ public:
   void TurnPlayer(std::string direction);
   bool CheckVector(Vector2D v);
   void CheckForWeapon();
+  void CheckForManOverBoard();
 
   int   cxClient()const{return m_cxClient;}
   int   cyClient()const{return m_cyClient;}

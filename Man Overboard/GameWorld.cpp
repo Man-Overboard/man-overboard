@@ -270,6 +270,14 @@ void GameWorld::CheckForWeapon() {
 	m_weaponPositions = temp;
 }
 
+void GameWorld::CheckForManOverBoard() {
+	if (m_player == m_manOverboard){
+		if(m_enemyPositions.empty()){
+			// Game Over!!!
+		}
+	}
+}
+
 void GameWorld::DrawGameObjects(){
 	gdi->GreenBrush();
 	gdi->Circle(m_manOverboard.x, m_manOverboard.y, 20);
@@ -286,6 +294,14 @@ void GameWorld::DrawGameObjects(){
 	while (!tempQueue.empty()){
 		Vector2D position = tempQueue.front();
 		gdi->YellowBrush();
+		gdi->Circle(position.x, position.y, 20);
+		tempQueue.pop();
+	}
+
+	tempQueue = m_objectsToAvoid;
+	while (!tempQueue.empty()){
+		Vector2D position = tempQueue.front();
+		gdi->RedBrush();
 		gdi->Circle(position.x, position.y, 20);
 		tempQueue.pop();
 	}
@@ -325,6 +341,22 @@ void GameWorld::GenerateWeaponPoints() {
 	}
 }
 
+void GameWorld::GenerateAvoidPoints() {
+	int i = 0;
+	while (i < constLevelOneObjectsToAvoidCount)
+	{
+		// random numbers
+		int randomX = rand() % constLevelOneGridSize + 0;
+		int randomY = rand() % constLevelOneGridSize + 0;
+		// check if equal to player, check nothing else on square
+		Vector2D barrel = Vector2D(m_vBox.x + (constBoxSize*randomX + (constBoxSize/2)), m_vBox.y + (constBoxSize*randomY + (constBoxSize/2)));
+		if (CheckVector(barrel)){
+			m_objectsToAvoid.push(barrel);
+			m_occupiedPositions.push_back(barrel);
+			i++;
+		}
+	}
+}
 
 //------------------------------ Render ----------------------------------
 //------------------------------------------------------------------------
@@ -336,10 +368,15 @@ void GameWorld::Render()
 
 	// draw enemy ships
 	if(init){
+		// save positions for player and goal
 		m_occupiedPositions.push_back(m_player);
 		m_occupiedPositions.push_back(m_manOverboard);
+		// save positions to prevent player being blocked in
+		m_occupiedPositions.push_back(Vector2D(m_player.x, m_player.y - constBoxSize));
+		m_occupiedPositions.push_back(Vector2D(m_player.x + constBoxSize, m_player.y));
 		GenerateEnemyPoints();
 		GenerateWeaponPoints();
+		GenerateAvoidPoints();
 		init = false;
 	}
 
