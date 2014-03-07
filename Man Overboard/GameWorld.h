@@ -34,6 +34,7 @@ private:
 
   // player object 
   Vector2D						m_player;
+  char							m_playerDirection;
 
   //keeps track of the average FPS
   double                         m_dAvFrameTime;
@@ -52,7 +53,7 @@ public:
   void Render();
   void DrawGrid();
   void DrawControls();
-  void DrawPlayer(int x, int y);
+  void DrawPlayer(Vector2D position);
   void DrawGameObjects();
   
   //handle WM_COMMAND messages
@@ -65,6 +66,7 @@ public:
   // adding to queue
   void	AddToQueueList(std::string command);
   bool ValidateMove(Vector2D newPosition);
+  void RunCommandSequence();
 
   int   cxClient()const{return m_cxClient;}
   int   cyClient()const{return m_cyClient;}

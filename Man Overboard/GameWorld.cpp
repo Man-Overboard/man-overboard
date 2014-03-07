@@ -18,7 +18,8 @@ GameWorld::GameWorld(int cx, int cy):
             m_cyClient(cy),
             m_bPaused(false),
 			m_vBox(Vector2D(cxClient()-(constWindowWidth-80), cyClient()-(constWindowHeight-80))), // get the values for the overall box the grid will be contained in
-			m_player(Vector2D(m_vBox.x + (constBoxSize/2), m_vBox.y + ((constLevelOneGridSize*constBoxSize)-constBoxSize/2)))
+			m_player(Vector2D(m_vBox.x + (constBoxSize/2), m_vBox.y + ((constLevelOneGridSize*constBoxSize)-constBoxSize/2))),
+			m_playerDirection('S')
 {
  
 }
@@ -68,7 +69,7 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
 		break;
 
 	case 'G':
-		DrawPlayer(m_player.x + constBoxSize, m_player.y);
+		RunCommandSequence();
 		break;
 
   }//end switch
@@ -140,14 +141,36 @@ void GameWorld::DrawControls(){
 	}
 }
 
-void GameWorld::DrawPlayer(int x, int y) {
-	bool valid = ValidateMove(Vector2D(x, y));
-	if(valid){
-		gdi->WhiteBrush();
-		gdi->Circle(x, y, 20);
+void GameWorld::DrawPlayer(Vector2D position) {
+	gdi->WhiteBrush();
+	gdi->Circle(position.x, position.y, 20);
 
-		m_player.x = x;
-		m_player.y = y;
+	m_player = position;
+}
+
+void GameWorld::RunCommandSequence() {
+	Vector2D position;
+	switch (m_playerDirection) {
+		case 'N' :
+			position.x = m_player.x;
+			position.y = m_player.y - constBoxSize;
+			break;
+		case 'S' :
+			position.x = m_player.x;
+			position.y = m_player.y + constBoxSize;
+			break;
+		case 'E' :
+			position.x = m_player.x + constBoxSize;
+			position.y = m_player.y;
+			break;
+		case 'W' :
+			position.x = m_player.x - constBoxSize;
+			position.y = m_player.y;
+			break;
+	}
+	bool valid = ValidateMove(position);
+	if(valid){
+		DrawPlayer(position);
 	}
 }
 
@@ -173,7 +196,7 @@ void GameWorld::Render()
 	DrawGrid();
 	DrawControls();
 
-	DrawPlayer(m_player.x, m_player.y);
+	DrawPlayer(m_player);
 
   //gdi->TextAtPos(5, cyClient() - 20, "Click left mouse button to move crosshair, and right mouse button to move box");
   //gdi->TextAtPos(cxClient() -120, cyClient() - 20, "Press R to reset");
