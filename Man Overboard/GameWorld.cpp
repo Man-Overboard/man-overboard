@@ -14,7 +14,7 @@ GameWorld::GameWorld(int cx, int cy):
             m_cxClient(cx),
             m_cyClient(cy),
             m_bPaused(false),
-			m_vBox(Vector2D(cxClient()/8, cxClient()/1.15)), // get the values for the overall box the grid will be contained in
+			m_vBox(Vector2D(cxClient()-(constWindowWidth-80), cyClient()-100)), // get the values for the overall box the grid will be contained in
 			rectangle1(Vector2D(m_vBox.x, m_vBox.y-600)), // top left corner
 			rectangle2(Vector2D(m_vBox.x, m_vBox.y-400)), 
 			rectangle3(Vector2D(m_vBox.x, m_vBox.y-200)),
@@ -95,6 +95,7 @@ void GameWorld::Render()
   // the grid
   gdi->BlueBrush();
   gdi->BlackPen();
+  gdi->Rect(m_vBox.x, m_vBox.y, m_vBox.x + 200, m_vBox.y - 200 );
   gdi->Rect(rectangle1.x, rectangle1.y, rectangle1.x + 200, rectangle1.y - 200 );
   gdi->Rect(rectangle2.x, rectangle2.y, rectangle2.x + 200, rectangle2.y - 200 );
   gdi->Rect(rectangle3.x, rectangle3.y, rectangle3.x + 200, rectangle3.y - 200 );
