@@ -68,7 +68,7 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
 		break;
 
 	case 'G':
-		DrawPlayer(m_player.x, m_player.y - constBoxSize);
+		DrawPlayer(m_player.x + constBoxSize, m_player.y);
 		break;
 
   }//end switch
@@ -141,11 +141,27 @@ void GameWorld::DrawControls(){
 }
 
 void GameWorld::DrawPlayer(int x, int y) {
-	gdi->WhiteBrush();
-	gdi->Circle(x, y, 20);
+	bool valid = ValidateMove(Vector2D(x, y));
+	if(valid){
+		gdi->WhiteBrush();
+		gdi->Circle(x, y, 20);
 
-	m_player.x = x;
-	m_player.y = y;
+		m_player.x = x;
+		m_player.y = y;
+	}
+}
+
+bool GameWorld::ValidateMove(Vector2D newPosition)
+{
+	if(newPosition.x < m_vBox.x || newPosition.x > m_vBox.x + constBoxSize*constLevelOneGridSize) {
+		return false;
+	}
+
+	if(newPosition.y < m_vBox.y || newPosition.y > m_vBox.y + constBoxSize*constLevelOneGridSize) {
+		return false;
+	}
+
+	return true;
 }
 
 

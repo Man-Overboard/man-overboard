@@ -64,6 +64,7 @@ public:
 
   // adding to queue
   void	AddToQueueList(std::string command);
+  bool ValidateMove(Vector2D newPosition);
 
   int   cxClient()const{return m_cxClient;}
   int   cyClient()const{return m_cyClient;}
