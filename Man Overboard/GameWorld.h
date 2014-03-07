@@ -18,6 +18,7 @@
 #include <list>
 
 #include "Vector2D.h"
+#include "Level.h"
 
 class GameWorld
 { 
@@ -48,7 +49,9 @@ private:
   std::queue<Vector2D>							m_weaponPositions;
   std::list<Vector2D>							m_occupiedPositions;
   std::queue<Vector2D>							m_objectsToAvoid;
-  
+
+  // Levels
+  std::queue<Level>								levels;
 
 public:
   

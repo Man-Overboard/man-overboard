@@ -69,6 +69,7 @@
     <ClInclude Include="constants.h" />
     <ClInclude Include="CrudeTimer.h" />
     <ClInclude Include="GameWorld.h" />
+    <ClInclude Include="Level.h" />
     <ClInclude Include="PrecisionTimer.h" />
     <ClInclude Include="Regulator.h" />
     <ClInclude Include="Transformations.h" />
@@ -80,6 +81,7 @@
     <ClCompile Include="Cgdi.cpp" />
     <ClCompile Include="CrudeTimer.cpp" />
     <ClCompile Include="GameWorld.cpp" />
+    <ClCompile Include="Level.cpp" />
     <ClCompile Include="movement-main.cpp" />
     <ClCompile Include="PrecisionTimer.cpp" />
   </ItemGroup>

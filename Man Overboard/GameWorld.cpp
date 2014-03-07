@@ -2,6 +2,7 @@
 #include "constants.h"
 #include "Cgdi.h"
 #include "WindowUtils.h"
+#include "Level.h"
 
 #include <list>
 #include <queue>
@@ -19,12 +20,18 @@ GameWorld::GameWorld(int cx, int cy):
             m_cyClient(cy),
             m_bPaused(false),
 			m_vBox(Vector2D(cxClient()-(constWindowWidth-80), cyClient()-(constWindowHeight-80))), // get the values for the overall box the grid will be contained in
-			m_player(Vector2D(m_vBox.x + (constBoxSize/2), m_vBox.y + ((constLevelOneGridSize*constBoxSize)-constBoxSize/2))),
 			m_playerDirection('N'),
-			init(true),
-			m_manOverboard(Vector2D(m_vBox.x + ((constLevelOneGridSize*constBoxSize)-constBoxSize/2), m_vBox.y + (constBoxSize/2)))
+			init(true)
 {
+	// set the levels
+	Level level1 = Level(100, 8, 3, 1, 2);
+	levels.push(level1);
 
+	Level level2 = Level(100, 8, 3, 1, 4);
+	levels.push(level2);
+
+	Level level3 = Level(50, 12, 4, 1, 3);
+	levels.push(level3);
 }
 
 
@@ -100,14 +107,14 @@ void GameWorld::DrawGrid(){
   // the grid
   gdi->BlueBrush();
   gdi->BlackPen();
-  gdi->Rect(m_vBox.x, m_vBox.y, m_vBox.x + (constLevelOneGridSize*constBoxSize), m_vBox.y + (constLevelOneGridSize*constBoxSize) );
+  gdi->Rect(m_vBox.x, m_vBox.y, m_vBox.x + ((levels.front().gridSize)*(levels.front().boxSize)), m_vBox.y + ((levels.front().gridSize)*(levels.front().boxSize)) );
   int i;
-  for(i=0; i <= constLevelOneGridSize;i++){
-	  gdi->Line(Vector2D(m_vBox.x, m_vBox.y+(constBoxSize*i)), Vector2D(m_vBox.x + constBoxSize*constLevelOneGridSize, m_vBox.y+(constBoxSize*i)));
+  for(i=0; i <= (levels.front().gridSize);i++){
+	  gdi->Line(Vector2D(m_vBox.x, m_vBox.y+((levels.front().boxSize)*i)), Vector2D(m_vBox.x + (levels.front().boxSize)*(levels.front().gridSize), m_vBox.y+((levels.front().boxSize)*i)));
   }
 
-  for(i=0; i <= constLevelOneGridSize;i++){
-	  gdi->Line(Vector2D(m_vBox.x+(constBoxSize*i), m_vBox.y), Vector2D(m_vBox.x+(constBoxSize*i), m_vBox.y + constBoxSize*constLevelOneGridSize));
+  for(i=0; i <= (levels.front().gridSize);i++){
+	  gdi->Line(Vector2D(m_vBox.x+((levels.front().boxSize)*i), m_vBox.y), Vector2D(m_vBox.x+((levels.front().boxSize)*i), m_vBox.y + (levels.front().boxSize)*(levels.front().gridSize)));
   }
 }
 
@@ -117,7 +124,7 @@ void GameWorld::DrawControls(){
 
 	// Container Box
 	double x,y;
-	x = m_vBox.x + (constBoxSize*constLevelOneGridSize+(constBoxSize/2));
+	x = m_vBox.x + ((levels.front().boxSize)*(levels.front().gridSize)+((levels.front().boxSize)/2));
 	y = m_vBox.y;
 	gdi->Rect(x,y,x+constControlWidth,y+constControlHeight);
 
@@ -171,18 +178,18 @@ void GameWorld::MovePlayer(){
 	switch (m_playerDirection) {
 		case 'N' :
 			position.x = m_player.x;
-			position.y = m_player.y - constBoxSize;
+			position.y = m_player.y - (levels.front().boxSize);
 			break;
 		case 'S' :
 			position.x = m_player.x;
-			position.y = m_player.y + constBoxSize;
+			position.y = m_player.y + (levels.front().boxSize);
 			break;
 		case 'E' :
-			position.x = m_player.x + constBoxSize;
+			position.x = m_player.x + (levels.front().boxSize);
 			position.y = m_player.y;
 			break;
 		case 'W' :
-			position.x = m_player.x - constBoxSize;
+			position.x = m_player.x - (levels.front().boxSize);
 			position.y = m_player.y;
 			break;
 
@@ -191,6 +198,7 @@ void GameWorld::MovePlayer(){
 	if(valid){
 		DrawPlayer(position);
 		CheckForWeapon();
+		CheckForManOverBoard();
 	}
 }
 
@@ -233,11 +241,11 @@ void GameWorld::TurnPlayer(string direction) {
 
 bool GameWorld::ValidateMove(Vector2D newPosition)
 {
-	if(newPosition.x < m_vBox.x || newPosition.x > m_vBox.x + constBoxSize*constLevelOneGridSize) {
+	if(newPosition.x < m_vBox.x || newPosition.x > m_vBox.x + (levels.front().boxSize)*(levels.front().gridSize)) {
 		return false;
 	}
 
-	if(newPosition.y < m_vBox.y || newPosition.y > m_vBox.y + constBoxSize*constLevelOneGridSize) {
+	if(newPosition.y < m_vBox.y || newPosition.y > m_vBox.y + (levels.front().boxSize)*(levels.front().gridSize)) {
 		return false;
 	}
 
@@ -275,6 +283,11 @@ void GameWorld::CheckForManOverBoard() {
 		if(m_enemyPositions.empty()){
 			// Game Over!!!
 		}
+		levels.pop();
+		init = true;
+		m_enemyPositions = std::queue<Vector2D>();
+		m_objectsToAvoid = std::queue<Vector2D>();
+		m_weaponPositions = std::queue<Vector2D>();
 	}
 }
 
@@ -309,13 +322,13 @@ void GameWorld::DrawGameObjects(){
 
 void GameWorld::GenerateEnemyPoints() {
 	int i = 0;
-	while (i < constLevelOneEnemyCount)
+	while (i < levels.front().enemyCount)
 	{
 		// random numbers
-		int randomX = rand() % constLevelOneGridSize + 0;
-		int randomY = rand() % constLevelOneGridSize + 0;
+		int randomX = rand() % (levels.front().gridSize) + 0;
+		int randomY = rand() % (levels.front().gridSize) + 0;
 		// check if equal to player
-		Vector2D enemy = Vector2D(m_vBox.x + (constBoxSize*randomX + (constBoxSize/2)), m_vBox.y + (constBoxSize*randomY + (constBoxSize/2)));
+		Vector2D enemy = Vector2D(m_vBox.x + ((levels.front().boxSize)*randomX + ((levels.front().boxSize)/2)), m_vBox.y + ((levels.front().boxSize)*randomY + ((levels.front().boxSize)/2)));
 		if (CheckVector(enemy)){
 			m_enemyPositions.push(enemy);
 			m_occupiedPositions.push_back(enemy);
@@ -326,13 +339,13 @@ void GameWorld::GenerateEnemyPoints() {
 
 void GameWorld::GenerateWeaponPoints() {
 	int i = 0;
-	while (i < constLevelOneWeaponCount)
+	while (i < levels.front().weaponCount)
 	{
 		// random numbers
-		int randomX = rand() % constLevelOneGridSize + 0;
-		int randomY = rand() % constLevelOneGridSize + 0;
+		int randomX = rand() % (levels.front().gridSize) + 0;
+		int randomY = rand() % (levels.front().gridSize) + 0;
 		// check if equal to player, check nothing else on square
-		Vector2D weapon = Vector2D(m_vBox.x + (constBoxSize*randomX + (constBoxSize/2)), m_vBox.y + (constBoxSize*randomY + (constBoxSize/2)));
+		Vector2D weapon = Vector2D(m_vBox.x + ((levels.front().boxSize)*randomX + ((levels.front().boxSize)/2)), m_vBox.y + ((levels.front().boxSize)*randomY + ((levels.front().boxSize)/2)));
 		if (CheckVector(weapon)){
 			m_weaponPositions.push(weapon);
 			m_occupiedPositions.push_back(weapon);
@@ -343,13 +356,13 @@ void GameWorld::GenerateWeaponPoints() {
 
 void GameWorld::GenerateAvoidPoints() {
 	int i = 0;
-	while (i < constLevelOneObjectsToAvoidCount)
+	while (i < levels.front().objectsToAvoidCount)
 	{
 		// random numbers
-		int randomX = rand() % constLevelOneGridSize + 0;
-		int randomY = rand() % constLevelOneGridSize + 0;
+		int randomX = rand() % (levels.front().gridSize) + 0;
+		int randomY = rand() % (levels.front().gridSize) + 0;
 		// check if equal to player, check nothing else on square
-		Vector2D barrel = Vector2D(m_vBox.x + (constBoxSize*randomX + (constBoxSize/2)), m_vBox.y + (constBoxSize*randomY + (constBoxSize/2)));
+		Vector2D barrel = Vector2D(m_vBox.x + ((levels.front().boxSize)*randomX + ((levels.front().boxSize)/2)), m_vBox.y + ((levels.front().boxSize)*randomY + ((levels.front().boxSize)/2)));
 		if (CheckVector(barrel)){
 			m_objectsToAvoid.push(barrel);
 			m_occupiedPositions.push_back(barrel);
@@ -368,12 +381,16 @@ void GameWorld::Render()
 
 	// draw enemy ships
 	if(init){
+		// set the player and man overboard positions and direction
+		m_player = Vector2D(m_vBox.x + ((levels.front().boxSize)/2), m_vBox.y + (((levels.front().gridSize)*(levels.front().boxSize))-(levels.front().boxSize)/2));
+		m_manOverboard = Vector2D(m_vBox.x + (((levels.front().gridSize)*(levels.front().boxSize))-(levels.front().boxSize)/2), m_vBox.y + ((levels.front().boxSize)/2));
+		m_playerDirection = 'N';
 		// save positions for player and goal
 		m_occupiedPositions.push_back(m_player);
 		m_occupiedPositions.push_back(m_manOverboard);
 		// save positions to prevent player being blocked in
-		m_occupiedPositions.push_back(Vector2D(m_player.x, m_player.y - constBoxSize));
-		m_occupiedPositions.push_back(Vector2D(m_player.x + constBoxSize, m_player.y));
+		m_occupiedPositions.push_back(Vector2D(m_player.x, m_player.y - (levels.front().boxSize)));
+		m_occupiedPositions.push_back(Vector2D(m_player.x + (levels.front().boxSize), m_player.y));
 		GenerateEnemyPoints();
 		GenerateWeaponPoints();
 		GenerateAvoidPoints();
