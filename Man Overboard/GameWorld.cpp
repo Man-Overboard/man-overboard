@@ -149,6 +149,10 @@ void GameWorld::DrawControls(){
 		gdi->TextAtPos(x + 20, y + lineHeight*(10+counter), tempQueue.front());
 		tempQueue.pop();
 	}
+
+	// Weapon Box
+	gdi->Rect(x,y+constControlHeight+10,x+constControlWidth, y+constControlHeight+100);
+	gdi->TextAtPos(x + constControlWidth/4,y+constControlHeight+40, "Weapon");
 }
 
 void GameWorld::DrawPlayer(Vector2D position) {
@@ -271,6 +275,10 @@ void GameWorld::CheckForWeapon() {
 	while(!m_weaponPositions.empty()){
 		if(m_player == m_weaponPositions.front()){
 			// set that weapon has been picked up
+			double x,y;
+			x = m_vBox.x + ((levels.front().boxSize)*(levels.front().gridSize)+((levels.front().boxSize)/2)) + constControlWidth - 40;
+			y = m_vBox.y + constControlHeight + 60;
+			temp.push(Vector2D(x,y));
 		} else {
 			temp.push(m_weaponPositions.front());
 		}
