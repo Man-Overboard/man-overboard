@@ -50,6 +50,8 @@ private:
   std::list<Vector2D>							m_occupiedPositions;
   std::queue<Vector2D>							m_objectsToAvoid;
 
+  bool											m_runCommandSequence;
+
   // Levels
   std::queue<Level>								levels;
 

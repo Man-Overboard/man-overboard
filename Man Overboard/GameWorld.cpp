@@ -21,7 +21,8 @@ GameWorld::GameWorld(int cx, int cy):
             m_bPaused(false),
 			m_vBox(Vector2D(cxClient()-(constWindowWidth-80), cyClient()-(constWindowHeight-80))), // get the values for the overall box the grid will be contained in
 			m_playerDirection('N'),
-			init(true)
+			init(true),
+			m_runCommandSequence(false)
 {
 	// set the levels
 	Level level1 = Level(100, 8, 3, 1, 2);
@@ -79,7 +80,7 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
 		break;
 
 	case 'G':
-		RunCommandSequence();
+		m_runCommandSequence = true;
 		break;
 
   }//end switch
@@ -164,7 +165,7 @@ void GameWorld::DrawPlayer(Vector2D position) {
 
 void GameWorld::RunCommandSequence() {
 	// pop the command off the queue
-	while (!m_commandQueue.empty()){
+	if (!m_commandQueue.empty()){
 		string value = m_commandQueue.front();
 		if (value == "R" || value == "L"){
 			TurnPlayer(value);
@@ -173,6 +174,8 @@ void GameWorld::RunCommandSequence() {
 			MovePlayer();
 		}
 		m_commandQueue.pop();
+	} else {
+		m_runCommandSequence = false;
 	}
 	
 }
@@ -446,6 +449,12 @@ void GameWorld::Render()
 
 	DrawGameObjects();
 
-	DrawPlayer(m_player);
+	if(m_runCommandSequence){
+		RunCommandSequence();
+		DrawPlayer(m_player);
+		Sleep(1000);
+	} else {
+		DrawPlayer(m_player);
+	}
 
 }
