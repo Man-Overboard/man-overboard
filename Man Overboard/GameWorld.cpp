@@ -24,7 +24,7 @@ GameWorld::GameWorld(int cx, int cy):
 			init(true),
 			m_runCommandSequence(false)
 {
-	// set the levels
+	// set the levels Level(int box, int grid, int enemy, int weapon, int objects);
 	Level level1 = Level(100, 8, 3, 1, 2);
 	levels.push(level1);
 
@@ -74,9 +74,7 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
       break;
 
 	case 'C':
-		while (!m_commandQueue.empty()) {
-			m_commandQueue.pop();
-		}	
+		m_commandQueue.pop_back();
 		break;
 
 	case 'G':
@@ -89,7 +87,7 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
 void GameWorld::AddToQueueList(string command)
 {
 	// logic to ensure queue not already full
-	m_commandQueue.push(command);
+	m_commandQueue.push_back(command);
 }
 
 
@@ -143,17 +141,20 @@ void GameWorld::DrawControls(){
 
 	// Queued Moves
 	gdi->TextAtPos(x + constControlWidth/4, y + lineHeight*10, "Queued Moves");
-	std::queue<std::string> tempQueue = m_commandQueue;
+	std::deque<std::string> tempQueue = m_commandQueue;
 	int counter = 0;
 	while (!tempQueue.empty()){
 		counter++;
 		gdi->TextAtPos(x + 20, y + lineHeight*(10+counter), tempQueue.front());
-		tempQueue.pop();
+		tempQueue.pop_front();
 	}
 
 	// Weapon Box
 	gdi->Rect(x,y+constControlHeight+10,x+constControlWidth, y+constControlHeight+100);
 	gdi->TextAtPos(x + constControlWidth/4,y+constControlHeight+40, "Weapon");
+
+	// info 
+	gdi->Rect(m_vBox.x, m_vBox.y+levels.front().gridSize*levels.front().boxSize + 20, m_vBox.x+levels.front().gridSize*levels.front().boxSize, m_vBox.y+levels.front().gridSize*levels.front().boxSize + 80);
 }
 
 void GameWorld::DrawPlayer(Vector2D position) {
@@ -173,7 +174,7 @@ void GameWorld::RunCommandSequence() {
 		if (value == "F"){
 			MovePlayer();
 		}
-		m_commandQueue.pop();
+		m_commandQueue.pop_front();
 	} else {
 		m_runCommandSequence = false;
 	}

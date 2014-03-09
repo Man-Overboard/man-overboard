@@ -16,6 +16,7 @@
 #include <vector>
 #include <queue>
 #include <list>
+#include <deque>
 
 #include "Vector2D.h"
 #include "Level.h"
@@ -44,7 +45,7 @@ private:
   //keeps track of the average FPS
   double                         m_dAvFrameTime;
 
-  std::queue<std::string>						m_commandQueue;
+  std::deque<std::string>						m_commandQueue;
   std::queue<Vector2D>							m_enemyPositions;
   std::queue<Vector2D>							m_weaponPositions;
   std::list<Vector2D>							m_occupiedPositions;
