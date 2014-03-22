@@ -13,8 +13,12 @@ public :
 	int weaponCount;
 	int objectsToAvoidCount;
 
+	// bools for available controls
+	bool loopControls;
+	bool conditionalControls;
+
 public :
 
-	Level(int box, int grid, int enemy, int weapon, int objects);
+	Level(int box, int grid, int enemy, int weapon, int objects, bool loopControls, bool conditionalControls);
 };
 #endif

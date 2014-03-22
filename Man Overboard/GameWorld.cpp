@@ -28,14 +28,34 @@ GameWorld::GameWorld(int cx, int cy):
 			m_hasWeapon(false)
 {
 	// set the levels Level(int box, int grid, int enemy, int weapon, int objects);
-	Level level1 = Level(100, 8, 3, 1, 2);
+	Level level0 = Level(200,2,0,0,0, false, false);
+	levels.push(level0);
+
+	Level level1 = Level(150,4,0,0,0, false, false);
 	levels.push(level1);
 
-	Level level2 = Level(100, 8, 3, 1, 4);
+	Level level2 = Level(150,4,0,0,1, false, false);
 	levels.push(level2);
 
-	Level level3 = Level(50, 12, 4, 1, 3);
+	Level level3 = Level(100,6,0,0,2, false, false);
 	levels.push(level3);
+
+	// things to avoid level
+	// multiple to avoid
+	// weapon pick up / 1 enemy
+	// weapon, enemy and avoid
+	// multiple enemies
+	// loops
+	// if statements
+
+	/*Level level1 = Level(100, 8, 3, 1, 2, false, false);
+	levels.push(level1);
+
+	Level level2 = Level(100, 8, 3, 1, 4, true, false);
+	levels.push(level2);
+
+	Level level3 = Level(50, 12, 4, 1, 3, true, false);
+	levels.push(level3);*/
 }
 
 
@@ -97,7 +117,7 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
 		break;
 
 	case 'S':
-		if (!m_unfoldLoop){
+		if (!m_unfoldLoop && levels.front().loopControls){
 			AddToQueueList("START");
 			m_unfoldLoop = true;
 			m_inLoop = true;
@@ -105,7 +125,7 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
 		break;
 
 	case 'E':
-		if(m_commandQueue.empty() || m_commandQueue.back() != "START"){
+		if(m_commandQueue.empty() || m_commandQueue.back() != "START" && levels.front().loopControls){
 			AddToQueueList("END");
 			m_inLoop = false;
 		}
@@ -176,8 +196,10 @@ void GameWorld::DrawControls(){
 	gdi->TextAtPos(x + constControlTabOffset, y + lineHeight*4, "TURN LEFT 90 (L)");
 	gdi->TextAtPos(x + constControlTabOffset, y + lineHeight*5, "CLEAR (C)");
 	gdi->TextAtPos(x + constControlTabOffset, y + lineHeight*6, "GO (G)");
-	gdi->TextAtPos(x + constControlTabOffset, y + lineHeight*7, "START (S)");
-	gdi->TextAtPos(x + constControlTabOffset, y + lineHeight*8, "END (E)");
+	if (levels.front().loopControls){
+		gdi->TextAtPos(x + constControlTabOffset, y + lineHeight*7, "START (S)");
+		gdi->TextAtPos(x + constControlTabOffset, y + lineHeight*8, "END (E)");
+	}
 
 	// Queued Moves
 	gdi->TextAtPos(x + constControlWidth/4, y + lineHeight*10, "Queued Moves");
