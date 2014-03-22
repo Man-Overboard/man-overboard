@@ -25,31 +25,32 @@ GameWorld::GameWorld(int cx, int cy):
 			m_runCommandSequence(false),
 			m_unfoldLoop(false),
 			m_inLoop(false),
-			m_hasWeapon(false)
+			m_hasWeapon(false),
+			m_movesTaken(0)
 {
 	// set the levels Level(int box, int grid, int enemy, int weapon, int objects);
-	Level level0 = Level(200,2,0,0,0, false, false);
+	Level level0 = Level(200,2,0,0,0, false, false, 3);
 	levels.push(level0);
 
-	Level level1 = Level(150,4,0,0,0, false, false);
+	Level level1 = Level(150,4,0,0,0, false, false, 9);
 	levels.push(level1);
 
-	Level level2 = Level(150,4,0,0,1, false, false);
+	Level level2 = Level(150,4,0,0,1, false, false, 10);
 	levels.push(level2);
 
-	Level level3 = Level(100,6,0,0,2, false, false);
+	Level level3 = Level(100,6,0,0,2, false, false, 15);
 	levels.push(level3);
 
-	Level level4 = Level(150,4,1,1,0, false, false);
+	Level level4 = Level(150,4,1,1,0, false, false, 20);
 	levels.push(level4);
 
-	Level level5 = Level(100,6,1,1,1, false, false);
+	Level level5 = Level(100,6,1,1,1, false, false, 35);
 	levels.push(level5);
 
-	Level level6 = Level(100,8,0,0,1, true, false);
+	Level level6 = Level(180,4,0,0,0, true, false, 6);
 	levels.push(level6);
 
-	Level level7 = Level(100,8,1,1,1, true, false);
+	Level level7 = Level(150,5,1,1,1, true, false, 25);
 	levels.push(level7);
 
 	// things to avoid level
@@ -90,7 +91,13 @@ void GameWorld::Update(double time_elapsed)
 //------------------------- HandleKeyPresses -----------------------------
 void GameWorld::HandleKeyPresses(WPARAM wParam)
 {
+	// if sequence currently running so not let new commands be added
 	if(m_runCommandSequence){
+		return;
+	}
+
+	// if moves taken is equal to moves allowed do not let commands be added
+	if(m_movesTaken == levels.front().maxMoves && wParam != 'G' && wParam != 'C' && wParam != 'Z' && wParam != 'E'){
 		return;
 	}
 
@@ -99,18 +106,21 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
     case 'F':
 		if(m_commandQueue.empty() || m_commandQueue.back() != "START"){
 			AddToQueueList(constMoveForward);
+			m_movesTaken ++;
 		}
       break;
 
     case 'R':
 		if(m_commandQueue.empty() || m_commandQueue.back() != "START"){
 			AddToQueueList(constMoveRight);
+			m_movesTaken ++;
 		}
       break;
 
 	case 'L':
 		if(m_commandQueue.empty() || m_commandQueue.back() != "START"){
 			AddToQueueList(constMoveLeft);
+			m_movesTaken ++;
 		}
       break;
 
@@ -119,8 +129,21 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
 			if (m_commandQueue.back() == "END"){
 				m_inLoop = true;
 			}
+			if (m_commandQueue.back() == "START"){
+				m_inLoop = false;
+			}
+			if (m_commandQueue.back() != "1" && m_commandQueue.back() != "2" && m_commandQueue.back() != "3" && 
+				m_commandQueue.back() != "4" && m_commandQueue.back() != "5" && m_commandQueue.back() != "6" && 
+				m_commandQueue.back() != "7" && m_commandQueue.back() != "8" && m_commandQueue.back() != "9" && 
+				m_commandQueue.back() != "END"){
+				m_movesTaken --;
+			}
 			m_commandQueue.pop_back();
 		}
+		break;
+
+	case 'Z':
+		init = true;
 		break;
 
 	case 'G':
@@ -130,15 +153,16 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
 		break;
 
 	case 'S':
-		if (!m_unfoldLoop && levels.front().loopControls){
+		if (!m_inLoop && levels.front().loopControls){
 			AddToQueueList("START");
 			m_unfoldLoop = true;
 			m_inLoop = true;
+			m_movesTaken ++;
 		}
 		break;
 
 	case 'E':
-		if(m_commandQueue.empty() || m_commandQueue.back() != "START" && levels.front().loopControls){
+		if(!m_commandQueue.empty() && m_commandQueue.back() != "START" && levels.front().loopControls && m_inLoop){
 			AddToQueueList("END");
 			m_inLoop = false;
 		}
@@ -209,13 +233,14 @@ void GameWorld::DrawControls(){
 	gdi->TextAtPos(x + constControlTabOffset, y + lineHeight*4, "TURN LEFT 90 (L)");
 	gdi->TextAtPos(x + constControlTabOffset, y + lineHeight*5, "CLEAR (C)");
 	gdi->TextAtPos(x + constControlTabOffset, y + lineHeight*6, "GO (G)");
+	gdi->TextAtPos(x + constControlTabOffset, y + lineHeight*7, "RESET (Z)");
 	if (levels.front().loopControls){
-		gdi->TextAtPos(x + constControlTabOffset, y + lineHeight*7, "START (S)");
-		gdi->TextAtPos(x + constControlTabOffset, y + lineHeight*8, "END (E)");
+		gdi->TextAtPos(x + constControlTabOffset, y + lineHeight*8, "START (S)");
+		gdi->TextAtPos(x + constControlTabOffset, y + lineHeight*9, "END (E)");
 	}
 
 	// Queued Moves
-	gdi->TextAtPos(x + constControlWidth/4, y + lineHeight*10, "Queued Moves");
+	gdi->TextAtPos(x + constControlWidth/4, y + lineHeight*12, "Queued Moves");
 	std::deque<std::string> tempQueue = m_commandQueue;
 	int counter = 0;
 	int offset = constControlTabOffset;
@@ -224,7 +249,7 @@ void GameWorld::DrawControls(){
 		if(tempQueue.front() == "END"){
 			offset = constControlTabOffset;
 		}
-		gdi->TextAtPos(x + offset, y + lineHeight*(10+counter), tempQueue.front());
+		gdi->TextAtPos(x + offset, y + lineHeight*(12+counter), tempQueue.front());
 		if(tempQueue.front() == "START"){
 			/*tempQueue.pop_front();
 			gdi->TextAtPos(x + offset+20, y + lineHeight*(10+counter), tempQueue.front());*/
@@ -236,6 +261,11 @@ void GameWorld::DrawControls(){
 	// Weapon Box
 	gdi->Rect(x,y+constControlHeight+10,x+constControlWidth, y+constControlHeight+100);
 	gdi->TextAtPos(x + constControlWidth/4,y+constControlHeight+40, "Weapon");
+
+	// Moves Box
+	gdi->Rect(x,y+constControlHeight+10,x+constControlWidth, y+constControlHeight+120);
+	gdi->TextAtPos(x + constControlWidth/10,y+constControlHeight+20, "Moves :");
+	gdi->TextAtPos(x + constControlWidth/3,y+constControlHeight+60, std::to_string(m_movesTaken) + "/" + std::to_string(levels.front().maxMoves));
 
 	// info 
 	gdi->Rect(m_vBox.x, m_vBox.y+levels.front().gridSize*levels.front().boxSize + 20, m_vBox.x+levels.front().gridSize*levels.front().boxSize, m_vBox.y+levels.front().gridSize*levels.front().boxSize + 80);
@@ -293,6 +323,7 @@ void GameWorld::UnFoldLoop() {
 					tempLoopQueue.pop_front();
 				}
 			}
+			loopQueue = std::deque<std::string>();
 		} else {
 			finalQueue.push_back(tempQueue.front());
 			tempQueue.pop_front();
@@ -417,11 +448,9 @@ void GameWorld::CheckForManOverBoard() {
 		if(m_enemyPositions.empty()){
 			// Game Over!!!
 			levels.pop();
+			// reset variables ready for next level
 			init = true;
-			m_enemyPositions = std::queue<Vector2D>();
-			m_objectsToAvoid = std::queue<Vector2D>();
-			m_weaponPositions = std::queue<Vector2D>();
-			m_commandQueue = std::deque<string>();
+			
 		}
 	}
 }
@@ -436,9 +465,6 @@ void GameWorld::CheckForDanger() {
 			// reset the grid
 			if (!m_hasWeapon){
 				init = true;
-				m_enemyPositions = std::queue<Vector2D>();
-				m_objectsToAvoid = std::queue<Vector2D>();
-				m_weaponPositions = std::queue<Vector2D>();
 				m_commandQueue = std::deque<string>();
 				return;
 			}
@@ -454,9 +480,6 @@ void GameWorld::CheckForDanger() {
 		if(m_player == m_objectsToAvoid.front()){
 			// reset the grid
 			init = true;
-			m_enemyPositions = std::queue<Vector2D>();
-			m_objectsToAvoid = std::queue<Vector2D>();
-			m_weaponPositions = std::queue<Vector2D>();
 			m_commandQueue = std::deque<string>();
 			return;
 		} else {
@@ -553,40 +576,47 @@ void GameWorld::GenerateAvoidPoints() {
 void GameWorld::Render()
 {
   // find all the game objects and draw them!
-	DrawGrid();
-	DrawControls();
+	if (!levels.empty()){
+		DrawGrid();
+		DrawControls();
 
-	// draw enemy ships
-	if(init){
-		// set the player and man overboard positions and direction
-		m_player = Vector2D(m_vBox.x + ((levels.front().boxSize)/2), m_vBox.y + (((levels.front().gridSize)*(levels.front().boxSize))-(levels.front().boxSize)/2));
-		m_manOverboard = Vector2D(m_vBox.x + (((levels.front().gridSize)*(levels.front().boxSize))-(levels.front().boxSize)/2), m_vBox.y + ((levels.front().boxSize)/2));
-		m_playerDirection = 'N';
-		// save positions for player and goal
-		m_occupiedPositions.push_back(m_player);
-		m_occupiedPositions.push_back(m_manOverboard);
-		// save positions to prevent player being blocked in
-		m_occupiedPositions.push_back(Vector2D(m_player.x, m_player.y - (levels.front().boxSize)));
-		m_occupiedPositions.push_back(Vector2D(m_player.x + (levels.front().boxSize), m_player.y));
-		GenerateEnemyPoints();
-		GenerateWeaponPoints();
-		GenerateAvoidPoints();
-		init = false;
-	}
-
-	DrawGameObjects();
-
-	if(m_runCommandSequence){
-		// first time round unfold loop here
-		if(m_unfoldLoop){
-			UnFoldLoop();
-			m_unfoldLoop = false;
+		// draw enemy ships
+		if(init){
+			m_enemyPositions = std::queue<Vector2D>();
+			m_objectsToAvoid = std::queue<Vector2D>();
+			m_weaponPositions = std::queue<Vector2D>();
+			m_commandQueue = std::deque<string>();
+			m_movesTaken = 0;
+			// set the player and man overboard positions and direction
+			m_player = Vector2D(m_vBox.x + ((levels.front().boxSize)/2), m_vBox.y + (((levels.front().gridSize)*(levels.front().boxSize))-(levels.front().boxSize)/2));
+			m_manOverboard = Vector2D(m_vBox.x + (((levels.front().gridSize)*(levels.front().boxSize))-(levels.front().boxSize)/2), m_vBox.y + ((levels.front().boxSize)/2));
+			m_playerDirection = 'N';
+			// save positions for player and goal
+			m_occupiedPositions.push_back(m_player);
+			m_occupiedPositions.push_back(m_manOverboard);
+			// save positions to prevent player being blocked in
+			m_occupiedPositions.push_back(Vector2D(m_player.x, m_player.y - (levels.front().boxSize)));
+			m_occupiedPositions.push_back(Vector2D(m_player.x + (levels.front().boxSize), m_player.y));
+			GenerateEnemyPoints();
+			GenerateWeaponPoints();
+			GenerateAvoidPoints();
+			init = false;
 		}
-		RunCommandSequence();
-		DrawPlayer(m_player);
-		Sleep(500);
-	} else {
-		DrawPlayer(m_player);
+
+		DrawGameObjects();
+
+		if(m_runCommandSequence){
+			// first time round unfold loop here
+			if(m_unfoldLoop){
+				UnFoldLoop();
+				m_unfoldLoop = false;
+			}
+			RunCommandSequence();
+			DrawPlayer(m_player);
+			Sleep(500);
+		} else {
+			DrawPlayer(m_player);
+		}
 	}
 
 }

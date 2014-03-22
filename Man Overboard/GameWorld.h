@@ -59,6 +59,9 @@ private:
   // Levels
   std::queue<Level>								levels;
 
+  // moves
+  int											m_movesTaken;
+
 public:
   
   GameWorld(int cx, int cy);

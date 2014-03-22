@@ -1,6 +1,6 @@
 #include "Level.h"
 
-Level::Level(int box, int grid, int enemy, int weapon, int objects, bool loop, bool conditional)
+Level::Level(int box, int grid, int enemy, int weapon, int objects, bool loop, bool conditional, int moves)
 {
 	boxSize = box;
 	gridSize = grid;
@@ -9,4 +9,5 @@ Level::Level(int box, int grid, int enemy, int weapon, int objects, bool loop, b
 	objectsToAvoidCount = objects;
 	loopControls = loop;
 	conditionalControls = conditional;
+	maxMoves = moves;
 }
