@@ -53,6 +53,7 @@ private:
 
   bool											m_runCommandSequence;
   bool											m_unfoldLoop;
+  bool											m_inLoop;
 
   // Levels
   std::queue<Level>								levels;

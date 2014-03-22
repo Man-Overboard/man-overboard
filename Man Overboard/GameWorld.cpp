@@ -23,7 +23,8 @@ GameWorld::GameWorld(int cx, int cy):
 			m_playerDirection('N'),
 			init(true),
 			m_runCommandSequence(false),
-			m_unfoldLoop(false)
+			m_unfoldLoop(false),
+			m_inLoop(false)
 {
 	// set the levels Level(int box, int grid, int enemy, int weapon, int objects);
 	Level level1 = Level(100, 8, 3, 1, 2);
@@ -62,37 +63,55 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
 
 
     case 'F':
-
-		AddToQueueList(constMoveForward);
+		if(m_commandQueue.empty() || m_commandQueue.back() != "START"){
+			AddToQueueList(constMoveForward);
+		}
       break;
 
     case 'R':
-		AddToQueueList(constMoveRight);
+		if(m_commandQueue.empty() || m_commandQueue.back() != "START"){
+			AddToQueueList(constMoveRight);
+		}
       break;
 
 	case 'L':
-		AddToQueueList(constMoveLeft);
+		if(m_commandQueue.empty() || m_commandQueue.back() != "START"){
+			AddToQueueList(constMoveLeft);
+		}
       break;
 
 	case 'C':
-		m_commandQueue.pop_back();
+		if(!m_commandQueue.empty()){
+			if (m_commandQueue.back() == "END"){
+				m_inLoop = true;
+			}
+			m_commandQueue.pop_back();
+		}
 		break;
 
 	case 'G':
-		m_runCommandSequence = true;
+		if (!m_inLoop){
+			m_runCommandSequence = true;
+		}
 		break;
 
 	case 'S':
-		AddToQueueList("START");
-		m_unfoldLoop = true;
+		if (!m_unfoldLoop){
+			AddToQueueList("START");
+			m_unfoldLoop = true;
+			m_inLoop = true;
+		}
 		break;
 
 	case 'E':
-		AddToQueueList("END");
+		if(m_commandQueue.empty() || m_commandQueue.back() != "START"){
+			AddToQueueList("END");
+			m_inLoop = false;
+		}
 		break;
 
 	case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
-		if(m_commandQueue.back() == "START"){
+		if(!m_commandQueue.empty() && m_commandQueue.back() == "START"){
 			string number;
 			number = (char) wParam;
 			AddToQueueList(number);
