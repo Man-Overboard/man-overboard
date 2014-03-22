@@ -24,7 +24,8 @@ GameWorld::GameWorld(int cx, int cy):
 			init(true),
 			m_runCommandSequence(false),
 			m_unfoldLoop(false),
-			m_inLoop(false)
+			m_inLoop(false),
+			m_hasWeapon(false)
 {
 	// set the levels Level(int box, int grid, int enemy, int weapon, int objects);
 	Level level1 = Level(100, 8, 3, 1, 2);
@@ -364,6 +365,7 @@ void GameWorld::CheckForWeapon() {
 			x = m_vBox.x + ((levels.front().boxSize)*(levels.front().gridSize)+((levels.front().boxSize)/2)) + constControlWidth - 40;
 			y = m_vBox.y + constControlHeight + 60;
 			temp.push(Vector2D(x,y));
+			m_hasWeapon = true;
 		} else {
 			temp.push(m_weaponPositions.front());
 		}
@@ -393,11 +395,13 @@ void GameWorld::CheckForDanger() {
 	while(!m_enemyPositions.empty()){
 		if(m_player == m_enemyPositions.front()){
 			// reset the grid
-			init = true;
-			m_enemyPositions = std::queue<Vector2D>();
-			m_objectsToAvoid = std::queue<Vector2D>();
-			m_weaponPositions = std::queue<Vector2D>();
-			return;
+			if (!m_hasWeapon){
+				init = true;
+				m_enemyPositions = std::queue<Vector2D>();
+				m_objectsToAvoid = std::queue<Vector2D>();
+				m_weaponPositions = std::queue<Vector2D>();
+				return;
+			}
 		} else {
 			temp.push(m_enemyPositions.front());
 		}

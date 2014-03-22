@@ -54,6 +54,7 @@ private:
   bool											m_runCommandSequence;
   bool											m_unfoldLoop;
   bool											m_inLoop;
+  bool											m_hasWeapon;
 
   // Levels
   std::queue<Level>								levels;
