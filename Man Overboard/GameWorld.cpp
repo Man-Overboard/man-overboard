@@ -78,11 +78,12 @@ void GameWorld::Update(double time_elapsed)
 //------------------------- HandleKeyPresses -----------------------------
 void GameWorld::HandleKeyPresses(WPARAM wParam)
 {
+	if(m_runCommandSequence){
+		return;
+	}
 
   switch(wParam)
   {
-
-
     case 'F':
 		if(m_commandQueue.empty() || m_commandQueue.back() != "START"){
 			AddToQueueList(constMoveForward);
