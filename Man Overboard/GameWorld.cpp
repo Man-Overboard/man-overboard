@@ -258,7 +258,10 @@ void GameWorld::RunCommandSequence() {
 		if (value == constMoveForward){
 			MovePlayer();
 		}
-		m_commandQueue.pop_front();
+		// if level has finished prevent empty queue from attempted pop
+		if(!init){
+			m_commandQueue.pop_front();
+		}
 	} else {
 		m_runCommandSequence = false;
 	}
@@ -413,12 +416,13 @@ void GameWorld::CheckForManOverBoard() {
 	if (m_player == m_manOverboard){
 		if(m_enemyPositions.empty()){
 			// Game Over!!!
+			levels.pop();
+			init = true;
+			m_enemyPositions = std::queue<Vector2D>();
+			m_objectsToAvoid = std::queue<Vector2D>();
+			m_weaponPositions = std::queue<Vector2D>();
+			m_commandQueue = std::deque<string>();
 		}
-		levels.pop();
-		init = true;
-		m_enemyPositions = std::queue<Vector2D>();
-		m_objectsToAvoid = std::queue<Vector2D>();
-		m_weaponPositions = std::queue<Vector2D>();
 	}
 }
 
@@ -435,6 +439,7 @@ void GameWorld::CheckForDanger() {
 				m_enemyPositions = std::queue<Vector2D>();
 				m_objectsToAvoid = std::queue<Vector2D>();
 				m_weaponPositions = std::queue<Vector2D>();
+				m_commandQueue = std::deque<string>();
 				return;
 			}
 		} else {
@@ -452,6 +457,7 @@ void GameWorld::CheckForDanger() {
 			m_enemyPositions = std::queue<Vector2D>();
 			m_objectsToAvoid = std::queue<Vector2D>();
 			m_weaponPositions = std::queue<Vector2D>();
+			m_commandQueue = std::deque<string>();
 			return;
 		} else {
 			temp2.push(m_objectsToAvoid.front());
