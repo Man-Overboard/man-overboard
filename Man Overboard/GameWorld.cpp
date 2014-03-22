@@ -40,6 +40,18 @@ GameWorld::GameWorld(int cx, int cy):
 	Level level3 = Level(100,6,0,0,2, false, false);
 	levels.push(level3);
 
+	Level level4 = Level(150,4,1,1,0, false, false);
+	levels.push(level4);
+
+	Level level5 = Level(100,6,1,1,1, false, false);
+	levels.push(level5);
+
+	Level level6 = Level(100,8,0,0,1, true, false);
+	levels.push(level6);
+
+	Level level7 = Level(100,8,1,1,1, true, false);
+	levels.push(level7);
+
 	// things to avoid level
 	// multiple to avoid
 	// weapon pick up / 1 enemy
