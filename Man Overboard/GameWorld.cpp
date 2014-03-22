@@ -22,7 +22,8 @@ GameWorld::GameWorld(int cx, int cy):
 			m_vBox(Vector2D(cxClient()-(constWindowWidth-80), cyClient()-(constWindowHeight-80))), // get the values for the overall box the grid will be contained in
 			m_playerDirection('N'),
 			init(true),
-			m_runCommandSequence(false)
+			m_runCommandSequence(false),
+			m_unfoldLoop(false)
 {
 	// set the levels Level(int box, int grid, int enemy, int weapon, int objects);
 	Level level1 = Level(100, 8, 3, 1, 2);
@@ -62,15 +63,15 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
 
     case 'F':
 
-		AddToQueueList("F");
+		AddToQueueList(constMoveForward);
       break;
 
     case 'R':
-		 AddToQueueList("R");
+		AddToQueueList(constMoveRight);
       break;
 
 	case 'L':
-		 AddToQueueList("L");
+		AddToQueueList(constMoveLeft);
       break;
 
 	case 'C':
@@ -79,6 +80,23 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
 
 	case 'G':
 		m_runCommandSequence = true;
+		break;
+
+	case 'S':
+		AddToQueueList("START");
+		m_unfoldLoop = true;
+		break;
+
+	case 'E':
+		AddToQueueList("END");
+		break;
+
+	case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
+		if(m_commandQueue.back() == "START"){
+			string number;
+			number = (char) wParam;
+			AddToQueueList(number);
+		}
 		break;
 
   }//end switch
@@ -133,19 +151,30 @@ void GameWorld::DrawControls(){
 	gdi->TextColor(Cgdi::black);
 
 	// Movement Controls
-	gdi->TextAtPos(x + 20, y + lineHeight*2, "FORWARD (F)");
-	gdi->TextAtPos(x + 20, y + lineHeight*3, "TURN RIGHT 90 (R)");
-	gdi->TextAtPos(x + 20, y + lineHeight*4, "TURN LEFT 90 (L)");
-	gdi->TextAtPos(x + 20, y + lineHeight*5, "CLEAR (C)");
-	gdi->TextAtPos(x + 20, y + lineHeight*6, "GO (G)");
+	gdi->TextAtPos(x + constControlTabOffset, y + lineHeight*2, "FORWARD (F)");
+	gdi->TextAtPos(x + constControlTabOffset, y + lineHeight*3, "TURN RIGHT 90 (R)");
+	gdi->TextAtPos(x + constControlTabOffset, y + lineHeight*4, "TURN LEFT 90 (L)");
+	gdi->TextAtPos(x + constControlTabOffset, y + lineHeight*5, "CLEAR (C)");
+	gdi->TextAtPos(x + constControlTabOffset, y + lineHeight*6, "GO (G)");
+	gdi->TextAtPos(x + constControlTabOffset, y + lineHeight*7, "START (S)");
+	gdi->TextAtPos(x + constControlTabOffset, y + lineHeight*8, "END (E)");
 
 	// Queued Moves
 	gdi->TextAtPos(x + constControlWidth/4, y + lineHeight*10, "Queued Moves");
 	std::deque<std::string> tempQueue = m_commandQueue;
 	int counter = 0;
+	int offset = constControlTabOffset;
 	while (!tempQueue.empty()){
 		counter++;
-		gdi->TextAtPos(x + 20, y + lineHeight*(10+counter), tempQueue.front());
+		if(tempQueue.front() == "END"){
+			offset = constControlTabOffset;
+		}
+		gdi->TextAtPos(x + offset, y + lineHeight*(10+counter), tempQueue.front());
+		if(tempQueue.front() == "START"){
+			/*tempQueue.pop_front();
+			gdi->TextAtPos(x + offset+20, y + lineHeight*(10+counter), tempQueue.front());*/
+			offset = constControlTabOffset + 30;
+		}
 		tempQueue.pop_front();
 	}
 
@@ -168,10 +197,10 @@ void GameWorld::RunCommandSequence() {
 	// pop the command off the queue
 	if (!m_commandQueue.empty()){
 		string value = m_commandQueue.front();
-		if (value == "R" || value == "L"){
+		if (value == constMoveRight || value == constMoveLeft){
 			TurnPlayer(value);
 		}
-		if (value == "F"){
+		if (value == constMoveForward){
 			MovePlayer();
 		}
 		m_commandQueue.pop_front();
@@ -179,6 +208,39 @@ void GameWorld::RunCommandSequence() {
 		m_runCommandSequence = false;
 	}
 	
+}
+
+void GameWorld::UnFoldLoop() {
+	int count = 0;
+	std::deque<std::string> tempQueue = m_commandQueue;
+	std::deque<std::string> loopQueue;
+	std::deque<std::string> tempLoopQueue;
+	std::deque<std::string> finalQueue;
+	while(!tempQueue.empty()){
+		if (tempQueue.front() == "START"){
+			// pop "START" off queue
+			tempQueue.pop_front();
+			count = atoi(tempQueue.front().c_str());
+			tempQueue.pop_front();
+			while (tempQueue.front() != "END"){
+				loopQueue.push_back(tempQueue.front());
+				tempQueue.pop_front();
+			}
+			// pop "END" off queue
+			tempQueue.pop_front();
+			for (int i = 0; i < count; i++){
+				tempLoopQueue = loopQueue;
+				while(!tempLoopQueue.empty()){
+					finalQueue.push_back(tempLoopQueue.front());
+					tempLoopQueue.pop_front();
+				}
+			}
+		} else {
+			finalQueue.push_back(tempQueue.front());
+			tempQueue.pop_front();
+		}
+	}
+	m_commandQueue = finalQueue;
 }
 
 void GameWorld::MovePlayer(){
@@ -214,34 +276,34 @@ void GameWorld::MovePlayer(){
 void GameWorld::TurnPlayer(string direction) {
 	switch (m_playerDirection) {
 		case 'N' :
-			if (direction == "R"){
+			if (direction == constMoveRight){
 				m_playerDirection = 'E';
 			}
-			if (direction == "L"){
+			if (direction == constMoveLeft){
 				m_playerDirection = 'W';
 			}
 			break;
 		case 'E' :
-			if (direction == "R"){
+			if (direction == constMoveRight){
 				m_playerDirection = 'S';
 			}
-			if (direction == "L"){
+			if (direction == constMoveLeft){
 				m_playerDirection = 'N';
 			}
 			break;
 		case 'S' :
-			if (direction == "R"){
+			if (direction == constMoveRight){
 				m_playerDirection = 'W';
 			}
-			if (direction == "L"){
+			if (direction == constMoveLeft){
 				m_playerDirection = 'E';
 			}
 			break;
 		case 'W' :
-			if (direction == "R"){
+			if (direction == constMoveRight){
 				m_playerDirection = 'N';
 			}
-			if (direction == "L"){
+			if (direction == constMoveLeft){
 				m_playerDirection = 'S';
 			}
 			break;
@@ -451,9 +513,14 @@ void GameWorld::Render()
 	DrawGameObjects();
 
 	if(m_runCommandSequence){
+		// first time round unfold loop here
+		if(m_unfoldLoop){
+			UnFoldLoop();
+			m_unfoldLoop = false;
+		}
 		RunCommandSequence();
 		DrawPlayer(m_player);
-		Sleep(1000);
+		Sleep(500);
 	} else {
 		DrawPlayer(m_player);
 	}

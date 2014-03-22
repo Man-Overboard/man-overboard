@@ -52,6 +52,7 @@ private:
   std::queue<Vector2D>							m_objectsToAvoid;
 
   bool											m_runCommandSequence;
+  bool											m_unfoldLoop;
 
   // Levels
   std::queue<Level>								levels;
@@ -81,7 +82,8 @@ public:
   bool        Paused()const{return m_bPaused;}
 
   // adding to queue
-  void	AddToQueueList(std::string command);
+  void AddToQueueList(std::string command);
+  void UnFoldLoop();
   bool ValidateMove(Vector2D newPosition);
   void RunCommandSequence();
   void MovePlayer();
