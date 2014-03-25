@@ -354,8 +354,9 @@ void GameWorld::DrawControls(){
 }
 
 void GameWorld::DrawPlayer(Vector2D position) {
-	gdi->WhiteBrush();
-	gdi->Circle(position.x, position.y, 20);
+	gdi->OrangeBrush();
+	gdi->OrangePen();
+	DrawBoat(position, 0.25);
 
 	m_player = position;
 }
@@ -581,22 +582,24 @@ void GameWorld::CheckForDanger() {
 }
 
 void GameWorld::DrawGameObjects(){
-	gdi->GreenBrush();
-	gdi->Circle(m_manOverboard.x, m_manOverboard.y, 20);
+	gdi->PinkBrush();
+	gdi->PinkPen();
+	DrawManOverboard(Vector2D(m_manOverboard.x, m_manOverboard.y), 0.5);
 
 	std::queue<Vector2D> tempQueue = m_enemyPositions;
 	while (!tempQueue.empty()){
 		Vector2D position = tempQueue.front();
 		gdi->BlackBrush();
-		gdi->Circle(position.x, position.y, 20);
+		gdi->BlackPen();
+		DrawBoat(position, 0.25);
+		//gdi->Circle(position.x, position.y, 20);
 		tempQueue.pop();
 	}
 
 	tempQueue = m_weaponPositions;
 	while (!tempQueue.empty()){
 		Vector2D position = tempQueue.front();
-		gdi->YellowBrush();
-		gdi->Circle(position.x, position.y, 20);
+		DrawCannon(position, 0.4);
 		tempQueue.pop();
 	}
 
@@ -604,7 +607,8 @@ void GameWorld::DrawGameObjects(){
 	while (!tempQueue.empty()){
 		Vector2D position = tempQueue.front();
 		gdi->RedBrush();
-		gdi->Circle(position.x, position.y, 20);
+		gdi->RedPen();
+		DrawBarrel(position, 0.5);
 		tempQueue.pop();
 	}
 }
@@ -684,31 +688,65 @@ void GameWorld::DrawSplashScreen() {
 
 	// show objects and descriptions
 	// player
-	gdi->WhiteBrush();
-	gdi->Circle(left+200, m_vBox.y + 300, 20);
-	gdi->TextAtPos(left+250, m_vBox.y + 290, "You");
+	gdi->OrangeBrush();
+	gdi->OrangePen();
+	DrawBoat(Vector2D(left+200, m_vBox.y + 300), 0.4);
+	gdi->TextAtPos(left+260, m_vBox.y + 290, "You");
 
 	// man overboard
-	gdi->GreenBrush();
-	gdi->Circle(left+200, m_vBox.y + 400, 20);
-	gdi->TextAtPos(left+250, m_vBox.y + 390, "Man Overboard");
+	gdi->PinkPen();
+	gdi->PinkBrush();
+	DrawManOverboard(Vector2D(left+200, m_vBox.y + 400), 0.5);
+	gdi->TextAtPos(left+260, m_vBox.y + 390, "Man Overboard");
 
 	// cargo - to avoid
 	gdi->RedBrush();
-	gdi->Circle(left+200, m_vBox.y + 500, 20);
-	gdi->TextAtPos(left+250, m_vBox.y + 490, "Cargo - AVOID!");
+	gdi->RedPen();
+	DrawBarrel(Vector2D(left+200, m_vBox.y + 500), 0.5);
+	gdi->TextAtPos(left+260, m_vBox.y + 490, "Cargo - AVOID!");
 
 	// pirate ship to defeat
 	gdi->BlackBrush();
-	gdi->Circle(left+200, m_vBox.y + 600, 20);
-	gdi->TextAtPos(left+250, m_vBox.y + 590, "Pirate Ship");
+	gdi->BlackPen();
+	DrawBoat(Vector2D(left+200, m_vBox.y + 600), 0.4);
+	gdi->TextAtPos(left+260, m_vBox.y + 590, "Pirate Ship");
 
 	// weapon to pick up before pirate ship can be destroyed
-	gdi->YellowBrush();
-	gdi->Circle(left+200, m_vBox.y + 700, 20);
-	gdi->TextAtPos(left+250, m_vBox.y + 690, "Weapon - Must be picked up before Pirates can be defeated");
+	DrawCannon(Vector2D(left+200, m_vBox.y + 700), 0.4);
+	gdi->TextAtPos(left+260, m_vBox.y + 690, "Weapon - Must be picked up before Pirates can be defeated");
 
 	gdi->TextAtPos(left+700, m_vBox.y + 800, "Press G to Save Our Souls!");
+}
+
+void GameWorld::DrawBoat(Vector2D centre, double scale){
+	gdi->Rect(centre.x-(80*scale), centre.y, centre.x+(80*scale), centre.y+(75*scale));
+	gdi->Rect(centre.x, centre.y, centre.x+(10*scale), centre.y-(120*scale));
+
+	gdi->Triangle(Vector2D(centre.x, centre.y-(120*scale)), Vector2D(centre.x-(100*scale),centre.y-(20*scale)), Vector2D(centre.x, centre.y - (20*scale)));
+
+	gdi->Triangle(Vector2D(centre.x-(80*scale), centre.y), Vector2D(centre.x-(120*scale),centre.y), Vector2D(centre.x-(80*scale), centre.y+(75*scale)));
+	gdi->Triangle(Vector2D(centre.x+(80*scale), centre.y), Vector2D(centre.x+(120*scale),centre.y), Vector2D(centre.x+(80*scale), centre.y+(75*scale)));
+}
+
+void GameWorld::DrawManOverboard(Vector2D centre, double scale){
+	gdi->Circle(centre.x, centre.y-(30*scale), 30*scale);
+	gdi->Line(centre, Vector2D(centre.x, centre.y+(80*scale)));
+
+	gdi->Line(Vector2D(centre.x-(30*scale), centre.y+(40*scale)), Vector2D(centre.x+(30*scale), centre.y+(40*scale)));
+}
+
+void GameWorld::DrawCannon(Vector2D centre, double scale){
+	gdi->BlackBrush();
+	gdi->BlackPen();
+	gdi->Rect(centre.x-(50*scale), centre.y, centre.x+(50*scale), centre.y-(25*scale));
+	gdi->BrownBrush();
+	gdi->BrownPen();
+	gdi->Triangle(Vector2D(centre.x-(50*scale), centre.y), Vector2D(centre.x-(80*scale), centre.y+(30*scale)), Vector2D(centre.x-(20*scale), centre.y+(30*scale)));
+}
+
+void GameWorld::DrawBarrel(Vector2D centre, double scale){
+	gdi->Rect(centre.x-(20*scale),centre.y-(40*scale), centre.x+(20*scale), centre.y+(40*scale));
+	//gdi->Circle(centre.x, centre.y-(30*scale), (19*scale));
 }
 
 //------------------------------ Render ----------------------------------

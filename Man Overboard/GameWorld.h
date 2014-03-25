@@ -83,6 +83,14 @@ public:
   void GenerateEnemyPoints();
   void GenerateWeaponPoints();
   void GenerateAvoidPoints();
+
+  void DrawBoat(Vector2D centre, double scale);
+
+  void DrawManOverboard(Vector2D centre, double scale);
+
+  void DrawCannon(Vector2D centre, double scale);
+
+  void DrawBarrel(Vector2D centre, double scale);
   
   //handle WM_COMMAND messages
   void        HandleKeyPresses(WPARAM wParam);
