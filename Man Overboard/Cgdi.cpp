@@ -46,6 +46,7 @@ Cgdi::Cgdi()
   m_LightBlueBrush = CreateSolidBrush(RGB(0,255,255));
   m_DarkGreenBrush = CreateSolidBrush(colors[dark_green]);
   m_OrangeBrush = CreateSolidBrush(colors[orange]);
+  m_PinkBrush = CreateSolidBrush(colors[pink]);
 
   m_hdc = NULL;
 }

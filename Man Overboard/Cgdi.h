@@ -118,6 +118,8 @@ private:
   HBRUSH  m_LightBlueBrush;
   HBRUSH  m_DarkGreenBrush;
 
+  HBRUSH m_PinkBrush;
+
   HDC    m_hdc;
 
   //constructor is private
@@ -168,6 +170,7 @@ public:
   void LightBlueBrush() {if(m_hdc)SelectObject(m_hdc, m_LightBlueBrush);}
   void DarkGreenBrush() {if(m_hdc)SelectObject(m_hdc, m_DarkGreenBrush);}
   void OrangeBrush() {if(m_hdc)SelectObject(m_hdc, m_OrangeBrush);}
+  void PinkBrush() {if(m_hdc)SelectObject(m_hdc, m_PinkBrush);}
 
 
 
@@ -294,6 +297,20 @@ public:
     p[0] = VectorToPOINT(ArrowPoint1);
     p[1] = VectorToPOINT(ArrowPoint2);
     p[2] = VectorToPOINT(to);                  
+                       
+    SetPolyFillMode(m_hdc, WINDING);
+    Polygon(m_hdc, p, 3);
+
+  }
+
+  void Triangle(Vector2D p1, Vector2D p2, Vector2D p3)
+  {    
+    //draw the arrowhead (filled with the currently selected brush)
+    POINT p[3];
+    
+    p[0] = VectorToPOINT(p1);
+    p[1] = VectorToPOINT(p2);
+    p[2] = VectorToPOINT(p3);                  
                        
     SetPolyFillMode(m_hdc, WINDING);
     Polygon(m_hdc, p, 3);
