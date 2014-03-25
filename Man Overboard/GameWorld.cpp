@@ -31,28 +31,68 @@ GameWorld::GameWorld(int cx, int cy):
 	m_isGameStart(true)
 {
 	// set the levels Level(int box, int grid, int enemy, int weapon, int objects);
-	Level level0 = Level(200,2,0,0,0, false, false, 3);
+	std::queue<string> level0Story = std::queue<string>();
+	level0Story.push("Arr, me hearties!");
+	level0Story.push("Navigate the seas to pick up yer");
+	level0Story.push("first shipmate");
+
+	std::queue<string> level1Story = std::queue<string>();
+	level1Story.push("Ye seem to be getting the hang of this here vessel!");
+	level1Story.push("We like to work in a sequential order here");
+	level1Story.push("Let's save our next shipmate");
+
+	std::queue<string> level2Story = std::queue<string>();
+	level2Story.push("Ahoy Landlubber!");
+	level2Story.push("Now here's one of those cargo I mentioned that ye have to avoid");
+	level2Story.push("Good luck!");
+
+	std::queue<string> level3Story = std::queue<string>();
+	level3Story.push("Avast! Yet more of those blasted barrels floating the seas!");
+	level3Story.push("Let's see if ye can conquer a larger section");
+
+	std::queue<string> level4Story = std::queue<string>();
+	level4Story.push("Pirates' ho!");
+	level4Story.push("Lets blast them grubby pirates to smithereens!");
+	level4Story.push("Pick up the weapon first then lets teach 'em a lesson.");
+
+	std::queue<string> level5Story = std::queue<string>();
+	level5Story.push("More o' them stinkin' Pirates!");
+	level5Story.push("Lets show them what real men are made of!");
+	level5Story.push("Watch out for that there explosive barrel again.");
+
+	std::queue<string> level6Story = std::queue<string>();
+	level6Story.push("Sounds like your losing your voice!");
+	level6Story.push("Use some of those there commands to get the crew to do the same things again");
+	level6Story.push("Shout START to begin the loop and then tell the crew how many times they need to do it.");
+	level6Story.push("Let the crew know you've finished by shouting END");
+
+	std::queue<string> level7Story = std::queue<string>();
+	level7Story.push("Looks like them Pirates be coming at us again!");
+	level7Story.push("Use your new found skills to get the crew to do more movements with less shouting.");
+	level7Story.push("Once we sorted out those ruffians we can sail to pick up another of our fine bunch.");
+
+	Level level0 = Level(200,2,0,0,0, false, false, 3, level0Story);
 	levels.push(level0);
 
-	Level level1 = Level(150,4,0,0,0, false, false, 9);
+	Level level1 = Level(150,4,0,0,0, false, false, 9, level1Story);
 	levels.push(level1);
 
-	Level level2 = Level(150,4,0,0,1, false, false, 10);
+	Level level2 = Level(150,4,0,0,1, false, false, 10, level2Story);
 	levels.push(level2);
 
-	Level level3 = Level(100,6,0,0,2, false, false, 15);
+	Level level3 = Level(100,6,0,0,2, false, false, 15, level3Story);
 	levels.push(level3);
 
-	Level level4 = Level(150,4,1,1,0, false, false, 20);
+	Level level4 = Level(150,4,1,1,0, false, false, 20, level4Story);
 	levels.push(level4);
 
-	Level level5 = Level(100,6,1,1,1, false, false, 35);
+	Level level5 = Level(100,6,1,1,1, false, false, 35, level5Story);
 	levels.push(level5);
 
-	Level level6 = Level(180,4,0,0,0, true, false, 6);
+	Level level6 = Level(180,4,0,0,0, true, false, 6, level6Story);
 	levels.push(level6);
 
-	Level level7 = Level(150,5,1,1,1, true, false, 25);
+	Level level7 = Level(150,5,1,1,1, true, false, 25, level7Story);
 	levels.push(level7);
 
 	// things to avoid level
@@ -278,7 +318,15 @@ void GameWorld::DrawControls(){
 	gdi->TextAtPos(x + constControlWidth/3,y+constControlHeight+60, std::to_string(m_movesTaken) + "/" + std::to_string(levels.front().maxMoves));
 
 	// info 
-	gdi->Rect(m_vBox.x, m_vBox.y+levels.front().gridSize*levels.front().boxSize + 20, m_vBox.x+levels.front().gridSize*levels.front().boxSize, m_vBox.y+levels.front().gridSize*levels.front().boxSize + 80);
+	gdi->Rect(m_vBox.x, m_vBox.y+levels.front().gridSize*levels.front().boxSize + 20, m_vBox.x+levels.front().gridSize*levels.front().boxSize-(constControlWidth/2), m_vBox.y+levels.front().gridSize*levels.front().boxSize + 130);
+	// loop over story queue and add to info box
+	int storyCounter = 0;
+	std::queue<string> tempStoryQueue = levels.front().story;
+	while(!tempStoryQueue.empty()){
+		gdi->TextAtPos(m_vBox.x+10,m_vBox.y+levels.front().gridSize*levels.front().boxSize + 30 + storyCounter*20, tempStoryQueue.front());
+		tempStoryQueue.pop();
+		storyCounter++;
+	}
 }
 
 void GameWorld::DrawPlayer(Vector2D position) {

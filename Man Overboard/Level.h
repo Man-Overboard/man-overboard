@@ -1,6 +1,10 @@
 #ifndef LEVEL_H
 #define LEVEL_H
 
+#include <queue>
+
+using std::string;
+
 class Level {
 
 public :
@@ -18,8 +22,10 @@ public :
 	bool loopControls;
 	bool conditionalControls;
 
+	std::queue<string>			story;
+
 public :
 
-	Level(int box, int grid, int enemy, int weapon, int objects, bool loopControls, bool conditionalControls, int maxMoves);
+	Level(int box, int grid, int enemy, int weapon, int objects, bool loopControls, bool conditionalControls, int maxMoves, std::queue<string> story);
 };
 #endif
