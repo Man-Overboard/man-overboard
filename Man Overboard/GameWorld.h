@@ -44,6 +44,7 @@ private:
 
   //keeps track of the average FPS
   double                         m_dAvFrameTime;
+  double						 m_playerScore;
 
   std::deque<std::string>						m_commandQueue;
   std::queue<Vector2D>							m_enemyPositions;
@@ -55,6 +56,7 @@ private:
   bool											m_unfoldLoop;
   bool											m_inLoop;
   bool											m_hasWeapon;
+  bool											m_isGameStart;
 
   // Levels
   std::queue<Level>								levels;
@@ -75,6 +77,8 @@ public:
   void DrawControls();
   void DrawPlayer(Vector2D position);
   void DrawGameObjects();
+  void DrawGameCompleteScreen();
+  void DrawSplashScreen();
   void GenerateEnemyPoints();
   void GenerateWeaponPoints();
   void GenerateAvoidPoints();
