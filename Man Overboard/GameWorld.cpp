@@ -331,10 +331,10 @@ void GameWorld::DrawControls(){
 	gdi->Rect(m_vBox.x+levels.front().gridSize*levels.front().boxSize-(constControlWidth/2), m_vBox.y+levels.front().gridSize*levels.front().boxSize + 20, m_vBox.x+levels.front().gridSize*levels.front().boxSize, m_vBox.y+levels.front().gridSize*levels.front().boxSize + 130);
 	gdi->TextAtPos(m_vBox.x-5+levels.front().gridSize*levels.front().boxSize-(constControlWidth/4),m_vBox.y+levels.front().gridSize*levels.front().boxSize + 35, "N");
 	gdi->TextAtPos(m_vBox.x-5+levels.front().gridSize*levels.front().boxSize-(constControlWidth/4),m_vBox.y+levels.front().gridSize*levels.front().boxSize + 100, "S");
-	gdi->TextAtPos(m_vBox.x+40+levels.front().gridSize*levels.front().boxSize-(constControlWidth/4),m_vBox.y+levels.front().gridSize*levels.front().boxSize + 70, "E");
-	gdi->TextAtPos(m_vBox.x-40+levels.front().gridSize*levels.front().boxSize-(constControlWidth/4),m_vBox.y+levels.front().gridSize*levels.front().boxSize + 70, "W");
+	gdi->TextAtPos(m_vBox.x+30+levels.front().gridSize*levels.front().boxSize-(constControlWidth/4),m_vBox.y+levels.front().gridSize*levels.front().boxSize + 65, "E");
+	gdi->TextAtPos(m_vBox.x-40+levels.front().gridSize*levels.front().boxSize-(constControlWidth/4),m_vBox.y+levels.front().gridSize*levels.front().boxSize + 65, "W");
 	Vector2D from = Vector2D(m_vBox.x+levels.front().gridSize*levels.front().boxSize-(constControlWidth/4),m_vBox.y+levels.front().gridSize*levels.front().boxSize + 70);
-	Vector2D to = Vector2D(m_vBox.x+levels.front().gridSize*levels.front().boxSize-(constControlWidth/4),m_vBox.y+levels.front().gridSize*levels.front().boxSize + 50);
+	Vector2D to;
 	switch(m_playerDirection){
 		case 'N' :
 			to = Vector2D(m_vBox.x+levels.front().gridSize*levels.front().boxSize-(constControlWidth/4),m_vBox.y+levels.front().gridSize*levels.front().boxSize + 50);
@@ -349,7 +349,8 @@ void GameWorld::DrawControls(){
 			to = Vector2D(m_vBox.x-20+levels.front().gridSize*levels.front().boxSize-(constControlWidth/4),m_vBox.y+levels.front().gridSize*levels.front().boxSize + 70);
 			break;
 	}
-	gdi->LineWithArrow(from, to, 20);
+	gdi->BlackBrush();
+	gdi->LineWithArrow(from, to, 10);
 }
 
 void GameWorld::DrawPlayer(Vector2D position) {
