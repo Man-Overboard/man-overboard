@@ -27,8 +27,9 @@ GameWorld::GameWorld(int cx, int cy):
 	m_inLoop(false),
 	m_hasWeapon(false),
 	m_movesTaken(0),
-	m_playerScore(0),
-	m_isGameStart(true)
+	m_playerScore(0.0),
+	m_isGameStart(true),
+	m_totalMovesAllowed(0)
 {
 	// set the levels Level(int box, int grid, int enemy, int weapon, int objects);
 	std::queue<string> level0Story = std::queue<string>();
@@ -139,7 +140,7 @@ void GameWorld::HandleKeyPresses(WPARAM wParam)
 	}
 
 	// if moves taken is equal to moves allowed do not let commands be added
-	if(m_movesTaken == levels.front().maxMoves && wParam != 'G' && wParam != 'C' && wParam != 'Z' && wParam != 'E'){
+	if((m_movesTaken == levels.front().maxMoves || m_commandQueue.size() == 15) && wParam != 'G' && wParam != 'C' && wParam != 'Z' && wParam != 'E'){
 		return;
 	}
 
@@ -291,31 +292,29 @@ void GameWorld::DrawControls(){
 
 	// Queued Moves
 	gdi->TextAtPos(x + constControlWidth/4, y + lineHeight*12, "Queued Moves");
-	std::deque<std::string> tempQueue = m_commandQueue;
+	std::deque<string> tempQueue = m_commandQueue;
 	int counter = 0;
 	int offset = constControlTabOffset;
-	while (!tempQueue.empty()){
+	while (!tempQueue.empty() && counter < 16){
 		counter++;
 		if(tempQueue.front() == "END"){
 			offset = constControlTabOffset;
 		}
 		gdi->TextAtPos(x + offset, y + lineHeight*(12+counter), tempQueue.front());
 		if(tempQueue.front() == "START"){
-			/*tempQueue.pop_front();
-			gdi->TextAtPos(x + offset+20, y + lineHeight*(10+counter), tempQueue.front());*/
 			offset = constControlTabOffset + 30;
 		}
 		tempQueue.pop_front();
 	}
 
 	// Weapon Box
-	gdi->Rect(x,y+constControlHeight+10,x+constControlWidth, y+constControlHeight+100);
-	gdi->TextAtPos(x + constControlWidth/4,y+constControlHeight+40, "Weapon");
+	gdi->Rect(x+constControlWidth/2,y+constControlHeight+10,x+constControlWidth, y+constControlHeight+120);
+	gdi->TextAtPos(x+20 + constControlWidth/2,y+constControlHeight+20, "Weapon");
 
 	// Moves Box
-	gdi->Rect(x,y+constControlHeight+10,x+constControlWidth, y+constControlHeight+120);
+	gdi->Rect(x,y+constControlHeight+10,x+constControlWidth/2, y+constControlHeight+120);
 	gdi->TextAtPos(x + constControlWidth/10,y+constControlHeight+20, "Moves :");
-	gdi->TextAtPos(x + constControlWidth/3,y+constControlHeight+60, std::to_string(m_movesTaken) + "/" + std::to_string(levels.front().maxMoves));
+	gdi->TextAtPos(x + constControlWidth/4,y+constControlHeight+60, std::to_string(m_movesTaken) + "/" + std::to_string(levels.front().maxMoves));
 
 	// info 
 	gdi->Rect(m_vBox.x, m_vBox.y+levels.front().gridSize*levels.front().boxSize + 20, m_vBox.x+levels.front().gridSize*levels.front().boxSize-(constControlWidth/2), m_vBox.y+levels.front().gridSize*levels.front().boxSize + 130);
@@ -327,6 +326,30 @@ void GameWorld::DrawControls(){
 		tempStoryQueue.pop();
 		storyCounter++;
 	}
+
+	// compass box
+	gdi->Rect(m_vBox.x+levels.front().gridSize*levels.front().boxSize-(constControlWidth/2), m_vBox.y+levels.front().gridSize*levels.front().boxSize + 20, m_vBox.x+levels.front().gridSize*levels.front().boxSize, m_vBox.y+levels.front().gridSize*levels.front().boxSize + 130);
+	gdi->TextAtPos(m_vBox.x-5+levels.front().gridSize*levels.front().boxSize-(constControlWidth/4),m_vBox.y+levels.front().gridSize*levels.front().boxSize + 35, "N");
+	gdi->TextAtPos(m_vBox.x-5+levels.front().gridSize*levels.front().boxSize-(constControlWidth/4),m_vBox.y+levels.front().gridSize*levels.front().boxSize + 100, "S");
+	gdi->TextAtPos(m_vBox.x+40+levels.front().gridSize*levels.front().boxSize-(constControlWidth/4),m_vBox.y+levels.front().gridSize*levels.front().boxSize + 70, "E");
+	gdi->TextAtPos(m_vBox.x-40+levels.front().gridSize*levels.front().boxSize-(constControlWidth/4),m_vBox.y+levels.front().gridSize*levels.front().boxSize + 70, "W");
+	Vector2D from = Vector2D(m_vBox.x+levels.front().gridSize*levels.front().boxSize-(constControlWidth/4),m_vBox.y+levels.front().gridSize*levels.front().boxSize + 70);
+	Vector2D to = Vector2D(m_vBox.x+levels.front().gridSize*levels.front().boxSize-(constControlWidth/4),m_vBox.y+levels.front().gridSize*levels.front().boxSize + 50);
+	switch(m_playerDirection){
+		case 'N' :
+			to = Vector2D(m_vBox.x+levels.front().gridSize*levels.front().boxSize-(constControlWidth/4),m_vBox.y+levels.front().gridSize*levels.front().boxSize + 50);
+			break;
+		case 'E' :
+			to = Vector2D(m_vBox.x+20+levels.front().gridSize*levels.front().boxSize-(constControlWidth/4),m_vBox.y+levels.front().gridSize*levels.front().boxSize + 70);
+			break;
+		case 'S' :
+			to = Vector2D(m_vBox.x+levels.front().gridSize*levels.front().boxSize-(constControlWidth/4),m_vBox.y+levels.front().gridSize*levels.front().boxSize + 100);
+			break;
+		case 'W' :
+			to = Vector2D(m_vBox.x-20+levels.front().gridSize*levels.front().boxSize-(constControlWidth/4),m_vBox.y+levels.front().gridSize*levels.front().boxSize + 70);
+			break;
+	}
+	gdi->LineWithArrow(from, to, 20);
 }
 
 void GameWorld::DrawPlayer(Vector2D position) {
@@ -505,7 +528,14 @@ void GameWorld::CheckForManOverBoard() {
 	if (m_player == m_manOverboard){
 		if(m_enemyPositions.empty()){
 			// Game Over!!!
+			// update player score for level
+			m_playerScore += m_movesTaken;
+			m_totalMovesAllowed += levels.front().maxMoves;
 			levels.pop();
+			if(levels.empty()){
+				// display player score
+				m_playerScore = 100 - ((m_playerScore/m_totalMovesAllowed)*100);
+			}
 			// reset variables ready for next level
 			init = true;
 
@@ -641,8 +671,8 @@ void GameWorld::DrawGameCompleteScreen() {
 
 void GameWorld::DrawSplashScreen() {
 	gdi->WhiteBrush();
-	double left = m_vBox.x+(constWindowWidth-900)/2;
-	gdi->Rect(left, m_vBox.y, (double)constWindowWidth-((constWindowWidth-900)/2), m_vBox.y + 700);
+	double left = (m_vBox.x+(constWindowWidth-900)/2)-80;
+	gdi->Rect(left, m_vBox.y, (double)constWindowWidth-((constWindowWidth-900)/2), m_vBox.y + 900);
 
 	gdi->BlackPen();
 	gdi->TextAtPos(left+300, m_vBox.y + 100, "Ahoy there, Matey!");
@@ -652,6 +682,32 @@ void GameWorld::DrawSplashScreen() {
 	gdi->TextAtPos(left+50, m_vBox.y + 210, "Oh and one other thing, ye best be wary o' them pesky pirates!");
 
 	// show objects and descriptions
+	// player
+	gdi->WhiteBrush();
+	gdi->Circle(left+200, m_vBox.y + 300, 20);
+	gdi->TextAtPos(left+250, m_vBox.y + 290, "You");
+
+	// man overboard
+	gdi->GreenBrush();
+	gdi->Circle(left+200, m_vBox.y + 400, 20);
+	gdi->TextAtPos(left+250, m_vBox.y + 390, "Man Overboard");
+
+	// cargo - to avoid
+	gdi->RedBrush();
+	gdi->Circle(left+200, m_vBox.y + 500, 20);
+	gdi->TextAtPos(left+250, m_vBox.y + 490, "Cargo - AVOID!");
+
+	// pirate ship to defeat
+	gdi->BlackBrush();
+	gdi->Circle(left+200, m_vBox.y + 600, 20);
+	gdi->TextAtPos(left+250, m_vBox.y + 590, "Pirate Ship");
+
+	// weapon to pick up before pirate ship can be destroyed
+	gdi->YellowBrush();
+	gdi->Circle(left+200, m_vBox.y + 700, 20);
+	gdi->TextAtPos(left+250, m_vBox.y + 690, "Weapon - Must be picked up before Pirates can be defeated");
+
+	gdi->TextAtPos(left+700, m_vBox.y + 800, "Press G to Save Our Souls!");
 }
 
 //------------------------------ Render ----------------------------------
@@ -675,11 +731,8 @@ void GameWorld::Render()
 			m_objectsToAvoid = std::queue<Vector2D>();
 			m_weaponPositions = std::queue<Vector2D>();
 			m_commandQueue = std::deque<string>();
-
-			// update player score for level
-			m_playerScore += m_movesTaken;
 			m_movesTaken = 0;
-
+			m_hasWeapon = false;
 			// set the player and man overboard positions and direction
 			m_player = Vector2D(m_vBox.x + ((levels.front().boxSize)/2), m_vBox.y + (((levels.front().gridSize)*(levels.front().boxSize))-(levels.front().boxSize)/2));
 			m_manOverboard = Vector2D(m_vBox.x + (((levels.front().gridSize)*(levels.front().boxSize))-(levels.front().boxSize)/2), m_vBox.y + ((levels.front().boxSize)/2));
@@ -711,7 +764,6 @@ void GameWorld::Render()
 			DrawPlayer(m_player);
 		}
 	} else {
-		// display player score
 		DrawGameCompleteScreen();
 	}
 

@@ -45,6 +45,7 @@ private:
   //keeps track of the average FPS
   double                         m_dAvFrameTime;
   double						 m_playerScore;
+  double						 m_totalMovesAllowed;
 
   std::deque<std::string>						m_commandQueue;
   std::queue<Vector2D>							m_enemyPositions;
