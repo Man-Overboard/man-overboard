@@ -212,7 +212,12 @@ LRESULT CALLBACK WindowProc (HWND   hwnd,
               SendMessage(hwnd, WM_DESTROY, NULL, NULL);
             }
           
-            break;           
+            break;  
+
+		   case VK_SPACE:
+			   {
+				   g_GameWorld = new GameWorld(cxClient, cyClient);
+			   }
 
         }//end switch
 

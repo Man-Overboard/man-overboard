@@ -536,7 +536,7 @@ void GameWorld::CheckForManOverBoard() {
 			levels.pop();
 			if(levels.empty()){
 				// display player score
-				m_playerScore = 100 - ((m_playerScore/m_totalMovesAllowed)*100);
+				m_playerScore = 100 - ((m_playerScore/m_totalMovesAllowed)*100)+20;
 			}
 			// reset variables ready for next level
 			init = true;
@@ -671,7 +671,19 @@ void GameWorld::DrawGameCompleteScreen() {
 
 	gdi->BlackPen();
 	gdi->TextAtPos(left+300, m_vBox.y + 100, "Congratulations, Matey!");
-	gdi->TextAtPos(left+300, m_vBox.y + 250, "Your Score is " + std::to_string(m_playerScore));
+	gdi->TextAtPos(left+150, m_vBox.y + 120, "Thanks for the help saving me crew! Yer definitely no Landlubber now!");
+	gdi->TextAtPos(left+150, m_vBox.y + 140, "Take this here loot as yer reward.");
+	gdi->TextAtPos(left+300, m_vBox.y + 250, "You earned " + std::to_string((int)m_playerScore) + " Gold Coins!");
+
+	gdi->PinkPen();
+	gdi->PinkBrush();
+	DrawManOverboard(Vector2D(left+450,m_vBox.y + 450), 1);
+
+	gdi->OrangePen();
+	gdi->OrangeBrush();
+	DrawBoat(Vector2D(left+400,m_vBox.y + 500), 1.5);
+
+	gdi->TextAtPos(left+300, m_vBox.y + 700, "Press SPACE to Play again");
 }
 
 void GameWorld::DrawSplashScreen() {
@@ -746,7 +758,6 @@ void GameWorld::DrawCannon(Vector2D centre, double scale){
 
 void GameWorld::DrawBarrel(Vector2D centre, double scale){
 	gdi->Rect(centre.x-(20*scale),centre.y-(40*scale), centre.x+(20*scale), centre.y+(40*scale));
-	//gdi->Circle(centre.x, centre.y-(30*scale), (19*scale));
 }
 
 //------------------------------ Render ----------------------------------
